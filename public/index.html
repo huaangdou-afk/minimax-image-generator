@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MiniMax AI 生成器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-primary: #0a0a0f; --bg-secondary: #12121a; --bg-card: #1a1a26;
+      --bg-card-hover: #22222f; --border: rgba(255,255,255,0.07);
+      --border-accent: rgba(139,92,246,0.4); --accent: #8b5cf6;
+      --accent-light: #a78bfa; --accent-glow: rgba(139,92,246,0.2);
+      --accent2: #06b6d4; --text-primary: #f1f0f5; --text-secondary: #8b8999;
+      --text-muted: #55536a; --success: #22c55e; --error: #ef4444;
+      --warning: #f59e0b; --radius: 14px; --radius-sm: 8px;
+    }
+    body { font-family: 'Noto Sans SC','Space Grotesk',sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+    body::before { content:''; position:fixed; top:-50%;left:-50%;width:200%;height:200%; background: radial-gradient(ellipse 80% 50% at 50% -5%,rgba(139,92,246,0.1) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 60%,rgba(6,182,212,0.05) 0%,transparent 50%); pointer-events:none; z-index:0; }
+    .app { position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:0 20px 60px; }
+    header { text-align:center; padding:40px 0 24px; }
+    .logo { display:inline-flex; align-items:center; gap:12px; margin-bottom:10px; }
+    .logo-icon { width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 28px var(--accent-glow); }
+    .logo h1 { font-family:'Space Grotesk',sans-serif; font-size:26px;font-weight:700;background:linear-gradient(135deg,#fff 30%,var(--accent-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent; }
+    .tagline { color:var(--text-secondary); font-size:13px; font-weight:300; }
+    .tab-nav { display:flex; gap:8px; margin-bottom:24px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius); padding:6px; }
+    .tab-btn { flex:1; display:flex; align-items:center; justify-content:center; gap:8px; padding:12px; border-radius:var(--radius-sm); border:none; background:transparent; color:var(--text-secondary); font-family:inherit; font-size:14px; font-weight:500; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+    .tab-btn:hover { color:var(--text-primary); background:var(--bg-card-hover); }
+    .tab-btn.active { background:var(--accent); color:#fff; box-shadow:0 2px 12px var(--accent-glow); }
+    .card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; }
+    .card-title { font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:8px; }
+    .card-title::before { content:'';width:3px;height:14px;background:var(--accent);border-radius:2px; }
+    .main-grid { display:grid; grid-template-columns:1fr 380px; gap:20px; }
+    @media(max-width:900px){.main-grid{grid-template-columns:1fr}} .tab-content{display:none} .tab-content.active{display:grid;grid-template-columns:1fr 380px} @media(max-width:900px){.tab-content.active{grid-template-columns:1fr}} .right-col{display:flex;flex-direction:column;gap:16px}
+    .image-display { width:100%;aspect-ratio:1;border-radius:var(--radius-sm);border:1px dashed rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;overflow:hidden;background:var(--bg-secondary);position:relative; }
+    .image-display.has-image{border:1px solid var(--border)} .image-display img{width:100%;height:100%;object-fit:contain} .placeholder-icon{font-size:48px;opacity:0.3} .placeholder-text{color:var(--text-muted);font-size:14px;text-align:center;line-height:1.6} .placeholder-text small{display:block;font-size:12px;margin-top:4px}
+    .loading-overlay{position:absolute;inset:0;background:rgba(10,10,15,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;border-radius:var(--radius-sm)}
+    .spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite} @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes dotPulse{0%,80%,100%{opacity:0.3}40%{opacity:1}} .dot{animation:dotPulse 1.4s infinite} .dot:nth-child(2){animation-delay:0.2s} .dot:nth-child(3){animation-delay:0.4s}
+    .image-actions{display:flex;gap:8px;margin-top:12px;opacity:0;transition:opacity 0.3s} .image-actions.visible{opacity:1}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--radius-sm);border:none;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+    .btn:disabled{opacity:0.5;cursor:not-allowed} .btn-primary{background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;box-shadow:0 4px 16px var(--accent-glow);flex:1} .btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 24px rgba(139,92,246,0.4)} .btn-secondary{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border)} .btn-secondary:hover:not(:disabled){background:var(--bg-card-hover);color:var(--text-primary)} .btn-icon{padding:10px 14px}
+    .prompt-area textarea{width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;color:var(--text-primary);font-family:inherit;font-size:14px;line-height:1.6;resize:vertical;min-height:90px;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+    .prompt-area textarea:focus{border-color:var(--border-accent);box-shadow:0 0 0 3px var(--accent-glow)} .prompt-area textarea::placeholder{color:var(--text-muted)} .prompt-meta{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--text-muted)}
+    .preset-tags{display:flex;flex-wrap:wrap;gap:8px} .preset-tag{padding:6px 14px;border-radius:20px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);font-size:12px;cursor:pointer;transition:all 0.2s;font-family:inherit} .preset-tag:hover{background:var(--accent-glow);border-color:var(--accent);color:var(--accent-light)} .preset-tag.active{background:var(--accent);border-color:var(--accent);color:#fff}
+    .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} .setting-item{display:flex;flex-direction:column;gap:6px} .setting-item.full{grid-column:1/-1} .setting-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:500}
+    .setting-select{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 30px 10px 12px;color:var(--text-primary);font-family:inherit;font-size:13px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b8999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color 0.2s} .setting-select:focus{border-color:var(--border-accent)}
+    .setting-slider{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--bg-secondary);outline:none;cursor:pointer} .setting-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 8px var(--accent-glow)}
+    .slider-value{font-size:12px;color:var(--accent-light);font-weight:500} .slider-row{display:flex;align-items:center;gap:10px}
+    .audio-player{width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;display:flex;flex-direction:column;gap:12px} .audio-player audio{width:100%;height:40px;border-radius:4px}
+    .voice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px} .voice-btn{padding:8px 6px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-secondary);font-size:11px;font-family:inherit;cursor:pointer;text-align:center;transition:all 0.2s;line-height:1.4} .voice-btn:hover{border-color:var(--accent);color:var(--accent-light)} .voice-btn.active{border-color:var(--accent);background:var(--accent-glow);color:var(--accent-light)}
+    .history-list{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:280px;overflow-y:auto} .history-list::-webkit-scrollbar{width:4px} .history-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+    .history-item{aspect-ratio:1;border-radius:var(--radius-sm);overflow:hidden;cursor:pointer;position:relative;border:1px solid var(--border);transition:all 0.2s} .history-item:hover{border-color:var(--accent);transform:scale(1.03)} .history-item img{width:100%;height:100%;object-fit:cover} .history-item-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;font-size:20px} .history-item:hover .history-item-overlay{opacity:1} .history-empty{grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted);font-size:13px}
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--bg-card);border:1px solid var(--error);color:var(--error);padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;z-index:1000;transform:translateY(100px);opacity:0;transition:all 0.3s} .toast.show{transform:translateY(0);opacity:1} .toast.success{border-color:var(--success);color:var(--success)}
+    .api-notice{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:var(--radius-sm);padding:12px 16px;font-size:12px;color:var(--warning);line-height:1.6;margin-bottom:20px}
+    .gallery-toolbar{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center} .gallery-search{flex:1;min-width:200px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text-primary);font-family:inherit;font-size:13px;outline:none;transition:border-color 0.2s,box-shadow 0.2s} .gallery-search:focus{border-color:var(--border-accent);box-shadow:0 0 0 3px var(--accent-glow)} .gallery-search::placeholder{color:var(--text-muted)}
+    .gallery-cat-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px} .gallery-cat-btn{padding:5px 12px;border-radius:16px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);font-size:12px;font-family:inherit;cursor:pointer;transition:all 0.2s} .gallery-cat-btn:hover{border-color:var(--accent);color:var(--accent-light)} .gallery-cat-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+    .gallery-count{font-size:12px;color:var(--text-muted);margin-bottom:12px} .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;max-height:65vh;overflow-y:auto;padding-right:4px}
+    .gallery-card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;gap:8px} .gallery-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.3)}
+    .gallery-card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px} .gallery-card-title{font-size:13px;font-weight:600;color:var(--text-primary);line-height:1.4;flex:1} .gallery-card-id{font-size:11px;color:var(--text-muted);white-space:nowrap}
+    .gallery-card-cats{display:flex;gap:4px;flex-wrap:wrap} .gallery-cat-tag{padding:2px 8px;border-radius:10px;background:var(--accent-glow);border:1px solid rgba(139,92,246,0.3);color:var(--accent-light);font-size:10px}
+    .gallery-card-preview{font-size:12px;color:var(--text-secondary);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+    .gallery-card-use{display:flex;gap:6px;margin-top:4px;opacity:0;transition:opacity 0.2s} .gallery-card:hover .gallery-card-use{opacity:1} .gallery-use-btn{flex:1;padding:6px 10px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-size:11px;font-family:inherit;cursor:pointer;transition:all 0.2s} .gallery-use-btn:hover{background:var(--accent-light)} .gallery-use-cn,.gallery-use-en{flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-size:11px;font-family:inherit;cursor:pointer;transition:all 0.2s} .gallery-use-cn:hover,.gallery-use-en:hover{border-color:var(--accent);color:var(--accent-light)}
+    .gallery-loading{text-align:center;padding:60px;color:var(--text-secondary} .gallery-loading .spinner{margin:0 auto 16px}
+    .gallery-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;align-items:center;justify-content:center;padding:20px} .gallery-modal.open{display:flex} .gallery-modal-content{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:700px;width:100%;max-height:85vh;overflow-y:auto}
+    .gallery-modal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px} .gallery-modal-title{font-size:16px;font-weight:600;color:var(--text-primary)} .gallery-modal-meta{font-size:11px;color:var(--text-muted);margin-top:4px} .gallery-modal-close{background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:4px;line-height:1} .gallery-modal-close:hover{color:var(--text-primary)}
+    .gallery-modal-prompt{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-size:13px;line-height:1.7;color:var(--text-secondary);white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto;margin-bottom:16px}
+    .gallery-modal-actions{display:flex;gap:8px} .gallery-modal-actions .btn{flex:1}
+    .tab-content.gallery-layout{display:none;flex-direction:column} .tab-content.gallery-layout.active{display:flex}
+    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    .tts-preview{min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px} .tts-preview .placeholder-icon{font-size:48px;opacity:0.3} .tts-preview .placeholder-text{color:var(--text-muted);font-size:14px;text-align:center;line-height:1.6}
+    @media(max-width:600px){.gallery-grid{grid-template-columns:1fr}.gallery-toolbar{flex-direction:column}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo"><div class="logo-icon">✦</div><h1>MiniMax AI 生成器</h1></div>
+    <p class="tagline">图片生成 · 语音合成 · 智能创作</p>
+  </header>
+
+  <div id="apiNotice" class="api-notice" style="display:none;">
+    ⚠️ 未配置 API Key，请点击右上角设置图标填入。
+  </div>
+
+  <div id="keyModal" class="gallery-modal open">
+    <div class="gallery-modal-content" style="max-width:500px;">
+      <div class="gallery-modal-header">
+        <div><div class="gallery-modal-title">🔑 设置 API Key</div><div class="gallery-modal-meta">API Key 仅保存在浏览器本地，不会上传</div></div>
+      </div>
+      <div class="gallery-modal-prompt" style="white-space:normal;line-height:1.8;">
+        填入你的 MiniMax API Key<br/>
+        <input id="apiKeyInput" type="password" placeholder="sk-xxxxxxxxxxxxxxxx" style="width:100%;margin:8px 0;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;" />
+        <button class="btn btn-primary" id="saveKeyBtn" style="width:100%;">保存并继续</button>
+        <div style="margin-top:12px;font-size:12px;color:var(--text-muted);line-height:1.6;">
+          获取地址：<a href="https://platform.minimaxi.com/console/api-keys" target="_blank" style="color:var(--accent-light);">platform.minimaxi.com/console/api-keys</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="image">🖼️ 图片生成</button>
+    <button class="tab-btn" data-tab="tts">🔊 语音合成</button>
+    <button class="tab-btn" data-tab="gallery">📚 提示词画廊</button>
+  </div>
+
+  <div class="tab-content active" id="tab-image">
+    <div class="left-col"><div class="card"><div class="card-title">预览</div>
+      <div class="image-display" id="imageDisplay"><div class="placeholder-icon">🎨</div><div class="placeholder-text">输入提示词开始生成<br/><small>生成的图片将显示在这里</small></div></div>
+      <div class="image-actions" id="imageActions"><button class="btn btn-secondary" id="btnDownload">⬇ 下载</button><button class="btn btn-secondary" id="btnCopy">📋 复制</button><button class="btn btn-secondary btn-icon" id="btnDelete">✕</button></div>
+    </div></div>
+    <div class="right-col">
+      <div class="card prompt-area"><div class="card-title">提示词</div>
+        <textarea id="imgPrompt" placeholder="描述你想要的图片内容，例如：一只可爱的橘猫在阳光下打盹，奇幻风格，超高画质"></textarea>
+        <div class="prompt-meta"><span>支持中文描述</span><span id="imgCharCount">0 / 2000</span></div>
+      </div>
+      <div class="card"><div class="card-title">快速提示词</div><div class="preset-tags" id="presetTags">
+        <button class="preset-tag" data-prompt="Cinematic fantasy scene of a fierce female warrior falconer walking through a dark misty forest, wearing battle-worn leather armor infused with glowing ember textures. Her arm is raised, commanding a massive phoenix-eagle hybrid with blazing wings and flaming feathers. Ultra-detailed feathers, realistic fire physics, dramatic lighting, volumetric fog, epic fantasy atmosphere, hyper-realistic, 8k, cinematic color grading">🔥 女猎鹰者</button>
+        <button class="preset-tag" data-prompt="Premium minimalist skincare product photography. A translucent pink liquid cleanser bottle with a white pump dispenser placed vertically at the center. The bottle rests inside an organic pool of soft pink foamy bubbles. Soft diffused top lighting, gentle rim light creates a luminous glow through the liquid. Sharp focus, high clarity, realistic liquid refraction, luxury beauty advertising style, ultra-realistic, 8K detail">🧴 高端护肤品</button>
+        <button class="preset-tag" data-prompt="Cinematic studio portrait of a woman seated at a dark stone table wearing a mocha satin shirt. In front of her is a ceramic bust sculpture of her own face, smooth matte finish. Soft cafe-inspired lighting, intimate and artistic mood, shallow depth of field, editorial realism, cozy cinematic tones">🎬 电影肖像</button>
+        <button class="preset-tag" data-prompt="A hyper-realistic top-down photograph of a 3D-printed diorama inside a beige cardboard box, with the lid being held open by two human hands. The interior reveals a miniature landscape featuring iconic landmarks, terrain, buildings, rivers, and crowds of tiny detailed human figures. Vibrant, toy-like style, matte 3D-printed textures, warm cinematic lighting, ultra-high resolution">📦 微缩景观</button>
+        <button class="preset-tag" data-prompt="A cave painting of a dragon, rendered with primitive ochres and charcoal lines on a rough stone wall. Smudged handprints, crude geometry, and flickering torchlight add a primal, ancient mood, prehistoric art style, mysterious atmosphere">🏛️ 洞穴壁画</button>
+        <button class="preset-tag" data-prompt="Three different fantasy sailboats in the ocean, multiple scenes of beautiful aurora borealis and colorful moons with snowy mountains, a dreamy fantasy landscape, in the style of digital art, vibrant colors, cinematic composition, ultra detailed">⛵ 极光帆船</button>
+        <button class="preset-tag" data-prompt="A bold vector logo design in glitch art style, featuring distorted typography with RGB color channel shifts, fragmented lines, misaligned edges, digital noise effects, and a cyberpunk aesthetic. Neon or high-saturation color palette, sharp angular forms, dark background, hyper-realistic render">🖼️ 故障艺术Logo</button>
+        <button class="preset-tag" data-prompt="A 3D sculpted logo in steampunk style, made of aged brass and oxidized iron, with visible rivets, gears, and vintage mechanical elements, distressed and weathered surface, rich copper and bronze tones, Victorian-style filigree, retro-industrial design, soft spotlight lighting, hyper-realistic render">⚙️ 蒸汽朋克Logo</button>
+        <button class="preset-tag" data-prompt="A flat branded paper folds itself into the full 3D shape of a sneaker, mid-motion. Dramatic studio lighting, origami texture detail, gradient shadows, Japanese minimalism feel, ultra-realistic 3D render, clean composition">👟 折纸球鞋</button>
+        <button class="preset-tag" data-prompt="A highly stylized promotional image of a musical instrument designed in the visual style of a luxury brand. Glowing accents, product-style lighting, joyful energy, 3D render look, high detail, vibrant colors, futuristic but playful">🎷 轻奢乐器</button>
+        <button class="preset-tag" data-prompt="A surreal oil painting of a dream landscape, executed in the style of early 20th-century dreamscapes. Melting shapes, floating forms, and swirling brushstrokes create a dreamlike dissonance, classic oil painting technique, haunting atmosphere, ultra detailed">🎨 超现实油画</button>
+        <button class="preset-tag" data-prompt="A realistic vintage item being gently lifted from a dusty stack of old books in a dimly lit attic. Warm nostalgic lighting, soft shadows and golden highlights filtering through attic beams, partially opened revealing a miniature warmly lit interior. Moody and nostalgic atmosphere, ultra-realistic photography, editorial quality">📚 阁楼怀旧</button>
+        <button class="preset-tag" data-prompt="A giant transparent capsule with a miniature 3D diorama inside, depicting a magical scene, studio-lit with soft shadows, placed on a neutral matte surface. Visual contrast between the scale of the capsule and the detail within, surreal, poetic, sci-fi aesthetic, hyper-realistic">💎 透明胶囊世界</button>
+        <button class="preset-tag" data-prompt="Highly dramatic and epic black and white manga-style illustration of a warrior. Powerful dynamic pose, exaggerated features emphasizing intensity, background with explosive energy bursts, lightning effects, and a whirlwind of debris, manga art style, ultra detailed">⚡ 动感漫画</button>
+        <button class="preset-tag" data-prompt="A highly detailed 3D isometric icon, miniature diorama with crisp edges, realistic textures, and soft handcrafted realism, isometric view, cinematic lighting, clean joyful composition, pastel colors, clay render style">🏠 3D等距图标</button>
+        <button class="preset-tag" data-prompt="Retro CRT computer boot screen that resolves into ASCII-art of a futuristic city skyline, vintage computer aesthetic, nostalgic tech feel, monochrome green on black, early computing atmosphere, creative digital art">💻 CRT复古屏幕</button>
+        <button class="preset-tag" data-prompt="A highly realistic 3D render of the letter A designed as a full-body fluffy monster. Dense soft realistic fur, subtle volume and shadow, bold clean solid vibrant tones like mint and coral, studio lighting on a simple pastel background, minimal high-quality character design">🔤 字母怪兽</button>
+        <button class="preset-tag" data-prompt="A square-format digital photograph showing a fictional pharmaceutical-style product packaging. Clean minimalist design, bold text with witty lines, soft lighting, modern packaging aesthetic, realistic product photography, 1:1 ratio">💊 药妆包装</button>
+        <button class="preset-tag" data-prompt="An ultra-realistic portrait of a woman with platinum blonde hair taking a morning selfie, natural window light, bedroom setting, soft romantic atmosphere, magazine editorial photography, shallow depth of field, cinematic tones">📸 晨间自拍</button>
+        <button class="preset-tag" data-prompt="Luxury-themed 1:1 image featuring a rose gold sculpture embodying elegance, premium crystal textures, iconic brand color palette, white studio lighting with high Kelvin value, editorial artistic visually exquisite result, hyper-realistic 3D render, ultra high resolution">🏺 玫瑰金雕塑</button>
+        <button class="preset-tag" data-prompt="A neon floral harmony illustration of a woman, with flowers and plants outlined in glowing neon hues, vibrant colors, serene yet electrifying botanical scene, fantasy illustration, ultra detailed, cinematic lighting">🌸 霓虹花卉</button>
+        <button class="preset-tag" data-prompt="A highly detailed 3D chibi figurine diorama of a character, captured in a dynamic action scene, inside a thematic display case with glass dome. Background with atmospheric effects, dynamic pose, studio cinematic lighting, vibrant color palette, collectible viral-friendly aesthetic, ultra detailed">🎭 Q版手办</button>
+        <button class="preset-tag" data-prompt="A next-gen wearable AI device blending refined minimalism with translucent aerogel fused with polished ceramic titanium, feather-light yet futuristic, no seams or traditional UI, photographed floating against a pure white background, soft diffused studio light, ultra-realistic product photography">⌚ AI穿戴设备</button>
+        <button class="preset-tag" data-prompt="Highly realistic 3D chibi plush emoji toy of a star, soft realistic fabric texture, dense plush filling, subtle shading and highlights, minimal studio background, gift packaging aesthetic, ultra detailed product photography, vibrant playful colors">🧸 3D表情公仔</button>
+      </div></div>
+      <div class="card"><div class="card-title">生成设置</div><div class="settings-grid">
+        <div class="setting-item"><span class="setting-label">尺寸</span>
+          <select class="setting-select" id="imgSize"><option value="1:1">1:1 (1024×1024)</option><option value="16:9">16:9 (1280×720)</option><option value="9:16">9:16 (720×1280)</option><option value="4:3">4:3 (1024×768)</option><option value="3:4">3:4 (768×1024)</option></select>
+        </div>
+        <div class="setting-item full"><span class="setting-label">随机种子</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="number" id="imgSeed" placeholder="留空随机" style="flex:1;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;color:var(--text-primary);font-family:inherit;font-size:13px;outline:none;" />
+            <button id="btnRandomSeed" style="padding:10px 12px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:var(--radius-sm);cursor:pointer;font-size:14px;display:flex;align-items:center;">🎲</button>
+          </div>
+        </div>
+      </div></div>
+      <button class="btn btn-primary" id="btnGenerateImg" style="padding:14px;font-size:15px;letter-spacing:0.5px;">✦ 开始生成图片</button>
+      <div class="card"><div class="card-title">历史记录</div><div class="history-list" id="imgHistoryList"><div class="history-empty">暂无历史记录</div></div></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-tts">
+    <div class="left-col"><div class="card"><div class="card-title">语音预览</div>
+      <div class="audio-player" id="ttsPlayer" style="display:none;">
+        <div id="ttsTextPreview" style="color:var(--text-secondary);font-size:13px;line-height:1.6;word-break:break-all;"></div>
+        <audio id="ttsAudio" controls></audio>
+        <div style="display:flex;gap:8px;"><button class="btn btn-secondary" id="btnDownloadAudio" style="flex:1;">⬇ 下载音频</button><button class="btn btn-secondary" id="btnCopyAudioUrl" style="flex:1;">📋 复制链接</button><button class="btn btn-secondary btn-icon" id="btnClearAudio">✕</button></div>
+      </div>
+      <div class="tts-preview" id="ttsPlaceholder"><div class="placeholder-icon">🔊</div><div class="placeholder-text">输入文本开始合成<br/><small>生成的语音将显示在这里</small></div></div>
+    </div></div>
+    <div class="right-col">
+      <div class="card prompt-area"><div class="card-title">文本内容</div>
+        <textarea id="ttsText" placeholder="输入要转换为语音的文本，例如：欢迎使用 MiniMax 语音合成功能。"></textarea>
+        <div class="prompt-meta"><span>输入文本内容</span><span id="ttsCharCount">0 / 5000</span></div>
+      </div>
+      <div class="card"><div class="card-title">音色选择</div><div class="voice-grid" id="voiceGrid">
+        <button class="voice-btn active" data-voice="male-qn-qingse">🎤<br>清澈少年</button>
+        <button class="voice-btn" data-voice="female-tianmei">🎤<br>甜美女声</button>
+        <button class="voice-btn" data-voice="female-shaonv">🎤<br>甜美少女</button>
+      </div></div>
+      <div class="card"><div class="card-title">语音设置</div><div class="settings-grid">
+        <div class="setting-item"><span class="setting-label">语速</span><div class="slider-row"><input type="range" class="setting-slider" id="ttsSpeed" min="0.5" max="2.0" step="0.1" value="1.0" /><span class="slider-value" id="ttsSpeedVal">1.0x</span></div></div>
+        <div class="setting-item"><span class="setting-label">模型</span><select class="setting-select" id="ttsModel"><option value="speech-2.8-hd">speech-2.8-hd (高清)</option></select></div>
+      </div></div>
+      <button class="btn btn-primary" id="btnSynthesize" style="padding:14px;font-size:15px;letter-spacing:0.5px;">✦ 开始合成语音</button>
+    </div>
+  </div>
+
+  <div class="tab-content gallery-layout" id="tab-gallery">
+    <div class="card" style="flex:1;">
+      <div class="card-title">提示词画廊 · 1116 个精选案例</div>
+      <div class="gallery-toolbar"><input type="text" class="gallery-search" id="gallerySearch" placeholder="🔍 搜索提示词关键词..." /></div>
+      <div class="gallery-cat-filters" id="galleryCatFilters"></div>
+      <div class="gallery-count" id="galleryCount">加载中...</div>
+      <div class="gallery-grid" id="galleryGrid"><div class="gallery-loading"><div class="spinner"></div><div>提示词加载中<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="gallery-modal" id="galleryModal">
+  <div class="gallery-modal-content">
+    <div class="gallery-modal-header">
+      <div><div class="gallery-modal-title" id="modalTitle"></div><div class="gallery-modal-meta" id="modalMeta"></div></div>
+      <button class="gallery-modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="gallery-modal-prompt" id="modalPrompt"></div>
+    <div class="gallery-modal-actions">
+      <button class="btn btn-primary" id="modalUseCn">✅ 使用中文提示词</button>
+      <button class="btn btn-secondary" id="modalUseEn">🌐 使用英文提示词</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =====================
+// Config & API
+// =====================
+const API_BASE_IMG = 'https://api.minimaxi.com/v1/image_generation';
+const API_BASE_TTS = 'https://api.minimaxi.com/v1/t2a_v2';
+
+function getApiKey() { return localStorage.getItem('mm_api_key') || ''; }
+function saveApiKey(k) { localStorage.setItem('mm_api_key', k); }
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast' + (type === 'success' ? ' success' : '');
+  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+}
+function escapeHtml(s) {
+  if (typeof s !== 'string') return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function parseSize(r) {
+  const [w,h] = r.split(':').map(Number);
+  const max = 1024;
+  const gcd = (a,b) => b===0?a:gcd(b,a%b);
+  const g = gcd(w,h);
+  return { width: max, height: Math.round(max * h / w) };
+}
+async function apiCall(url, body) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + getApiKey(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.base_resp?.status_msg || data.error || 'Request failed');
+  return data;
+}
+
+// =====================
+// Key Modal
+// =====================
+const keyModal = document.getElementById('keyModal');
+const apiKeyInput = document.getElementById('apiKeyInput');
+const saveKeyBtn = document.getElementById('saveKeyBtn');
+const apiNotice = document.getElementById('apiNotice');
+
+function checkKey() {
+  if (getApiKey()) {
+    keyModal.classList.remove('open');
+    apiNotice.style.display = 'none';
+  } else {
+    keyModal.classList.add('open');
+    apiNotice.style.display = 'block';
+  }
+}
+checkKey();
+saveKeyBtn.addEventListener('click', () => {
+  const k = apiKeyInput.value.trim();
+  if (!k) { showToast('请输入 API Key'); return; }
+  saveApiKey(k);
+  keyModal.classList.remove('open');
+  apiNotice.style.display = 'none';
+  showToast('API Key 保存成功', 'success');
+});
+
+// =====================
+// Tabs
+// =====================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    const t = document.getElementById('tab-' + btn.dataset.tab);
+    if (t) t.classList.add('active');
+  });
+});
+
+// =====================
+// Image Generation
+// =====================
+const imgPrompt = document.getElementById('imgPrompt');
+const imgCharCount = document.getElementById('imgCharCount');
+const presetTags = document.getElementById('presetTags');
+const imgSize = document.getElementById('imgSize');
+const imgSeed = document.getElementById('imgSeed');
+const btnRandomSeed = document.getElementById('btnRandomSeed');
+const btnGenerateImg = document.getElementById('btnGenerateImg');
+const imageDisplay = document.getElementById('imageDisplay');
+const imageActions = document.getElementById('imageActions');
+const btnDownload = document.getElementById('btnDownload');
+const btnCopy = document.getElementById('btnCopy');
+const btnDelete = document.getElementById('btnDelete');
+const imgHistoryList = document.getElementById('imgHistoryList');
+let currentImageUrl = null;
+let imgHistory = JSON.parse(localStorage.getItem('imgGenHistory') || '[]');
+
+imgPrompt.addEventListener('input', () => { imgCharCount.textContent = imgPrompt.value.length + ' / 2000'; });
+presetTags.addEventListener('click', e => {
+  const t = e.target.closest('.preset-tag');
+  if (!t) return;
+  document.querySelectorAll('.preset-tag').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  imgPrompt.value = t.dataset.prompt;
+  imgCharCount.textContent = imgPrompt.value.length + ' / 2000';
+  imgPrompt.focus();
+});
+btnRandomSeed.addEventListener('click', () => { imgSeed.value = Math.floor(Math.random() * 999999999); });
+
+function renderImage(url, fromHistory) {
+  imageDisplay.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = url; img.alt = 'Generated';
+  img.onload = () => { imageDisplay.classList.add('has-image'); imageActions.classList.add('visible'); };
+  imageDisplay.appendChild(img);
+  currentImageUrl = url;
+  if (!fromHistory) addToHistory(url);
+}
+function showLoadingImg() {
+  imageDisplay.innerHTML = '<div class="loading-overlay"><div class="spinner"></div><div class="loading-text">AI 正在生成图片<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div>';
+  imageDisplay.classList.remove('has-image'); imageActions.classList.remove('visible');
+}
+async function generateImage() {
+  if (!getApiKey()) { keyModal.classList.add('open'); showToast('请先设置 API Key'); return; }
+  const prompt = imgPrompt.value.trim();
+  if (!prompt) { showToast('请输入提示词'); imgPrompt.focus(); return; }
+  if (prompt.length > 1500) { showToast('提示词不能超过1500字'); return; }
+  const size = parseSize(imgSize.value);
+  btnGenerateImg.disabled = true; btnGenerateImg.textContent = '⏳ 生成中...';
+  showLoadingImg();
+  try {
+    const data = await apiCall(API_BASE_IMG, { model: 'image-01', prompt, width: size.width, height: size.height });
+    const url = data.data?.image_urls?.[0];
+    if (!url) throw new Error('No image URL returned');
+    renderImage(url);
+  } catch(err) {
+    imageDisplay.innerHTML = '<div style="text-align:center;color:var(--error);padding:20px;"><div style="font-size:36px;margin-bottom:8px;">⚠</div><div style="font-size:13px;">' + err.message + '</div></div>';
+    imageDisplay.classList.remove('has-image');
+  } finally {
+    btnGenerateImg.disabled = false; btnGenerateImg.textContent = '✦ 开始生成图片';
+  }
+}
+btnGenerateImg.addEventListener('click', generateImage);
+imgPrompt.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter') generateImage(); });
+
+btnDownload.addEventListener('click', async () => {
+  if (!currentImageUrl) return;
+  try {
+    const r = await fetch(currentImageUrl);
+    const b = await r.blob();
+    const u = URL.createObjectURL(b);
+    const a = document.createElement('a'); a.href = u; a.download = 'ai-image-' + Date.now() + '.jpg'; a.click();
+    URL.revokeObjectURL(u); showToast('下载成功', 'success');
+  } catch { showToast('下载失败'); }
+});
+btnCopy.addEventListener('click', () => {
+  if (!currentImageUrl) return;
+  navigator.clipboard.writeText(currentImageUrl).then(() => showToast('图片地址已复制', 'success')).catch(() => showToast('复制失败'));
+});
+btnDelete.addEventListener('click', () => {
+  imageDisplay.innerHTML = '<div class="placeholder-icon">🎨</div><div class="placeholder-text">输入提示词开始生成<br/><small>生成的图片将显示在这里</small></div>';
+  imageDisplay.classList.remove('has-image'); imageActions.classList.remove('visible'); currentImageUrl = null;
+});
+function addToHistory(url) {
+  imgHistory.unshift(url);
+  if (imgHistory.length > 30) imgHistory = imgHistory.slice(0, 30);
+  localStorage.setItem('imgGenHistory', JSON.stringify(imgHistory));
+  renderImgHistory();
+}
+function renderImgHistory() {
+  if (imgHistory.length === 0) { imgHistoryList.innerHTML = '<div class="history-empty">暂无历史记录</div>'; return; }
+  imgHistoryList.innerHTML = imgHistory.map(u => '<div class="history-item" data-url="' + escapeHtml(u) + '"><img src="' + escapeHtml(u) + '" alt="h" loading="lazy"/><div class="history-item-overlay">👁</div></div>').join('');
+}
+imgHistoryList.addEventListener('click', e => {
+  const it = e.target.closest('.history-item');
+  if (!it) return;
+  renderImage(it.dataset.url, true);
+});
+renderImgHistory();
+
+// =====================
+// TTS
+// =====================
+const ttsText = document.getElementById('ttsText');
+const ttsCharCount = document.getElementById('ttsCharCount');
+const voiceGrid = document.getElementById('voiceGrid');
+const ttsSpeed = document.getElementById('ttsSpeed');
+const ttsSpeedVal = document.getElementById('ttsSpeedVal');
+const btnSynthesize = document.getElementById('btnSynthesize');
+const ttsPlayer = document.getElementById('ttsPlayer');
+const ttsPlaceholder = document.getElementById('ttsPlaceholder');
+const ttsAudio = document.getElementById('ttsAudio');
+const ttsTextPreview = document.getElementById('ttsTextPreview');
+const btnDownloadAudio = document.getElementById('btnDownloadAudio');
+const btnCopyAudioUrl = document.getElementById('btnCopyAudioUrl');
+const btnClearAudio = document.getElementById('btnClearAudio');
+let currentAudioUrl = null;
+let selectedVoice = 'male-qn-qingse';
+
+ttsText.addEventListener('input', () => { ttsCharCount.textContent = ttsText.value.length + ' / 5000'; });
+ttsSpeed.addEventListener('input', () => { ttsSpeedVal.textContent = parseFloat(ttsSpeed.value).toFixed(1) + 'x'; });
+voiceGrid.addEventListener('click', e => {
+  const b = e.target.closest('.voice-btn');
+  if (!b) return;
+  document.querySelectorAll('.voice-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active'); selectedVoice = b.dataset.voice;
+});
+async function synthesize() {
+  if (!getApiKey()) { keyModal.classList.add('open'); showToast('请先设置 API Key'); return; }
+  const text = ttsText.value.trim();
+  if (!text) { showToast('请输入文本内容'); ttsText.focus(); return; }
+  if (text.length > 3000) { showToast('文本不能超过3000字'); return; }
+  btnSynthesize.disabled = true; btnSynthesize.textContent = '⏳ 合成中...';
+  try {
+    const data = await apiCall(API_BASE_TTS, {
+      model: 'speech-2.8-hd', text,
+      voice_setting: { voice_id: selectedVoice, speed: Math.min(2.0, Math.max(0.5, parseFloat(ttsSpeed.value) || 1.0)) },
+      output_format: 'url',
+    });
+    const url = data.data?.audio;
+    if (!url) throw new Error('No audio URL returned');
+    currentAudioUrl = url;
+    ttsTextPreview.textContent = text;
+    ttsAudio.src = url;
+    ttsPlaceholder.style.display = 'none';
+    ttsPlayer.style.display = 'flex';
+    showToast('语音合成成功', 'success');
+  } catch(err) {
+    showToast(err.message || '合成失败');
+  } finally {
+    btnSynthesize.disabled = false; btnSynthesize.textContent = '✦ 开始合成语音';
+  }
+}
+btnSynthesize.addEventListener('click', synthesize);
+ttsText.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter') synthesize(); });
+btnDownloadAudio.addEventListener('click', async () => {
+  if (!currentAudioUrl) return;
+  try {
+    const r = await fetch(currentAudioUrl);
+    const b = await r.blob();
+    const u = URL.createObjectURL(b);
+    const a = document.createElement('a'); a.href = u; a.download = 'ai-voice-' + Date.now() + '.mp3'; a.click();
+    URL.revokeObjectURL(u); showToast('下载成功', 'success');
+  } catch { showToast('下载失败'); }
+});
+btnCopyAudioUrl.addEventListener('click', () => {
+  if (!currentAudioUrl) return;
+  navigator.clipboard.writeText(currentAudioUrl).then(() => showToast('链接已复制', 'success')).catch(() => showToast('复制失败'));
+});
+btnClearAudio.addEventListener('click', () => {
+  ttsAudio.src = ''; currentAudioUrl = null; ttsPlayer.style.display = 'none'; ttsPlaceholder.style.display = 'flex';
+});
+
+// =====================
+// Gallery
+// =====================
+const gallerySearch = document.getElementById('gallerySearch');
+const galleryCatFilters = document.getElementById('galleryCatFilters');
+const galleryGrid = document.getElementById('galleryGrid');
+const galleryCount = document.getElementById('galleryCount');
+const galleryModal = document.getElementById('galleryModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalMeta = document.getElementById('modalMeta');
+const modalPrompt = document.getElementById('modalPrompt');
+const modalClose = document.getElementById('modalClose');
+const modalUseCn = document.getElementById('modalUseCn');
+const modalUseEn = document.getElementById('modalUseEn');
+let allPrompts = [], activeCategory = 'all', searchQuery = '', currentModalPrompt = '', currentPromptId = null;
+const catLabels = { portrait:'📸肖像', fashion:'👗时尚', product:'📦产品', '3d':'🎨3D渲染', fantasy:'🐉奇幻', anime:'🎭动漫', landscape:'🏔️风景', logo:'🏷️Logo', cyberpunk:'🌃赛博朋克', vintage:'📻复古', painting:'🖼️绘画', steampunk:'⚙️蒸汽朋克', minimalist:'⬜极简', food:'🍜美食', character:'👤人物', comics:'📚漫画', chinese:'🇨🇳中式', other:'📎其他' };
+const catColors = { portrait:'#ec4899',fashion:'#f43f5e',product:'#8b5cf6','3d':'#06b6d4',fantasy:'#f59e0b',anime:'#ec4899',landscape:'#22c55e',logo:'#3b82f6',cyberpunk:'#8b5cf6',vintage:'#78716c',painting:'#e879f9',steampunk:'#d97706',minimalist:'#94a3b8',food:'#f97316',character:'#f43f5e',comics:'#6366f1',chinese:'#ef4444',other:'#64748b' };
+
+async function loadPrompts() {
+  try {
+    const r = await fetch('./prompts.json');
+    const d = await r.json();
+    allPrompts = d.prompts || [];
+    renderCategoryFilters(d.categories || []);
+    renderGallery();
+  } catch(e) { galleryGrid.innerHTML = '<div class="gallery-loading">加载失败，请刷新重试</div>'; }
+}
+function renderCategoryFilters(cats) {
+  const all = ['all', ...cats];
+  galleryCatFilters.innerHTML = all.map(c =>
+    '<button class="gallery-cat-btn' + (c==='all'?' active':'') + '" data-cat="' + escapeHtml(c) + '">' + (c==='all'?'🌐全部':escapeHtml(catLabels[c]||c)) + '</button>'
+  ).join('');
+  galleryCatFilters.querySelectorAll('.gallery-cat-btn').forEach(b => b.addEventListener('click', () => {
+    activeCategory = b.dataset.cat;
+    galleryCatFilters.querySelectorAll('.gallery-cat-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderGallery();
+  }));
+}
+function filterPrompts() {
+  return allPrompts.filter(p => {
+    const mc = activeCategory==='all' || p.categories.includes(activeCategory);
+    const q = searchQuery.toLowerCase();
+    const ms = !q || p.title.toLowerCase().includes(q) || p.prompt.toLowerCase().includes(q);
+    return mc && ms;
+  });
+}
+function renderGallery() {
+  const f = filterPrompts();
+  galleryCount.textContent = '共 ' + f.length + ' / ' + allPrompts.length + ' 个提示词';
+  if (f.length === 0) { galleryGrid.innerHTML = '<div class="gallery-loading">没有找到匹配的提示词</div>'; return; }
+  galleryGrid.innerHTML = f.map(p => {
+    const cats = p.categories.slice(0,3).map(c => '<span class="gallery-cat-tag" style="border-color:' + (catColors[c]||'#8b5cf6') + '40;background:' + (catColors[c]||'#8b5cf6') + '15;color:' + (catColors[c]||'#8b5cf6') + '">' + escapeHtml(catLabels[c]||c) + '</span>').join('');
+    const preview = escapeHtml(p.prompt.substring(0,150)) + (p.prompt.length>150?'...':'');
+    const hasCn = p.promptCn && p.promptCn.length > 20;
+    const hasEn = p.promptEn && p.promptEn.length > 20;
+    return '<div class="gallery-card" data-id="' + p.id + '"><div class="gallery-card-header"><div class="gallery-card-title">' + escapeHtml(p.title) + '</div><div class="gallery-card-id">#' + p.id + '</div></div><div class="gallery-card-cats">' + cats + '</div><div class="gallery-card-preview">' + preview + '</div><div class="gallery-card-use">' + (hasCn?'<button class="gallery-use-cn">📝中文</button>':'') + (hasEn?'<button class="gallery-use-en">🌐英文</button>':'<button class="gallery-use-btn">📝使用</button>') + '</div></div>';
+  }).join('');
+}
+galleryGrid.addEventListener('click', e => {
+  const card = e.target.closest('.gallery-card');
+  if (!card) return;
+  const btn = e.target.closest('.gallery-use-cn, .gallery-use-en, .gallery-use-btn');
+  const id = parseInt(card.dataset.id);
+  const p = allPrompts.find(x => x.id === id);
+  if (!p) return;
+  const promptToUse = btn?.classList.contains('gallery-use-en') ? (p.promptEn||p.prompt) : (p.promptCn||p.prompt);
+  if (btn?.classList.contains('gallery-use-cn') || btn?.classList.contains('gallery-use-en')) {
+    document.querySelector('[data-tab="image"]').click();
+    document.getElementById('imgPrompt').value = promptToUse;
+    document.getElementById('imgCharCount').textContent = promptToUse.length + ' / 2000';
+    showToast('提示词已填入！', 'success');
+  } else {
+    currentPromptId = p.id; currentModalPrompt = promptToUse;
+    modalTitle.textContent = p.title;
+    modalMeta.textContent = '#' + p.id + (p.source?' · 来源: '+p.source:'');
+    modalPrompt.textContent = promptToUse;
+    modalUseCn.style.display = (p.promptCn && p.promptCn.length > 20) ? '' : 'none';
+    modalUseEn.style.display = (p.promptEn && p.promptEn.length > 20) ? '' : 'none';
+    galleryModal.classList.add('open');
+  }
+});
+gallerySearch.addEventListener('input', () => { searchQuery = gallerySearch.value; renderGallery(); });
+modalClose.addEventListener('click', () => galleryModal.classList.remove('open'));
+galleryModal.addEventListener('click', e => { if (e.target === galleryModal) galleryModal.classList.remove('open'); });
+modalUseCn.addEventListener('click', () => {
+  const p = allPrompts.find(x => x.id === currentPromptId);
+  const t = p ? (p.promptCn || p.prompt) : currentModalPrompt;
+  document.querySelector('[data-tab="image"]').click();
+  galleryModal.classList.remove('open');
+  document.getElementById('imgPrompt').value = t;
+  document.getElementById('imgCharCount').textContent = t.length + ' / 2000';
+  showToast('中文提示词已填入！', 'success');
+});
+modalUseEn.addEventListener('click', () => {
+  const p = allPrompts.find(x => x.id === currentPromptId);
+  const t = p ? (p.promptEn || p.prompt) : currentModalPrompt;
+  document.querySelector('[data-tab="image"]').click();
+  galleryModal.classList.remove('open');
+  document.getElementById('imgPrompt').value = t;
+  document.getElementById('imgCharCount').textContent = t.length + ' / 2000';
+  showToast('英文提示词已填入！', 'success');
+});
+const galleryTabBtn = document.querySelector('[data-tab="gallery"]');
+let galleryLoaded = false;
+galleryTabBtn.addEventListener('click', () => { if (!galleryLoaded) { galleryLoaded = true; loadPrompts(); } });
+loadPrompts();
+</script>
+</body>
+</html>
