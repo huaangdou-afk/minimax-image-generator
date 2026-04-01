@@ -55,8 +55,14 @@ npm start
 ```
 ├── server.js          # Express 后端服务器（持有 API Key）
 ├── public/
-│   ├── index.html    # 前端页面
+│   ├── index.html     # 前端页面
+│   ├── js/
+│   │   ├── utils.js   # 工具函数（toast、escapeHtml、parseSize）
+│   │   ├── api.js     # API 调用层（generateImage、synthesize、downloadUrl）
+│   │   └── ui.js      # UI 逻辑模块（图片/语音/画廊交互）
 │   └── prompts.json   # 提示词数据 (1116条)
+│                          说明：可通过 parse_prompts.js 从 prompts/ 目录
+│                          中的 markdown 源文件重新生成，变更需手动同步。
 ├── prompts/           # 原始提示词 markdown 文件
 ├── parse_prompts.js  # 提示词解析脚本
 ├── package.json
@@ -66,9 +72,45 @@ npm start
 
 ## 架构说明
 
-- **前端**：原生 HTML/CSS/JS，直接调用后端代理接口
+- **前端**：原生 HTML/CSS/JS（ES Modules），模块化架构
+  - `utils.js` — 工具函数（toast 提示、HTML 转义、尺寸解析）
+  - `api.js` — API 调用层（统一错误处理、类型化接口）
+  - `ui.js` — UI 逻辑（所有 DOM 交互与事件绑定）
 - **后端**：Node.js + Express，持有 MiniMax API Key 代理转发请求
 - **用户无需任何配置**，API Key 由部署者在服务端设置
+
+## 环境变量
+
+| 变量名 | 必填 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `MINIMAX_API_KEY` | 是 | — | MiniMax API Key，从 [控制台](https://platform.minimaxi.com/console/api-keys) 获取 |
+| `PORT` | 否 | `3000` | 服务器监听端口 |
+
+> 配置方法：复制 `.env.example` 为 `.env`，填入你的 API Key 后启动服务。
+
+## 使用指南
+
+### 图片生成
+1. 在提示词输入框输入中文或英文描述
+2. 从右侧「快速提示词」选择预设模板（可选）
+3. 调整尺寸（1:1 / 16:9 / 9:16 / 4:3 / 3:4）
+4. 点击「✦ 开始生成图片」或按 `Ctrl + Enter`
+5. 图片生成后点击「⬇ 下载」在新窗口打开，右键另存为
+
+### 语音合成
+1. 输入要转换的文本（最多 3000 字）
+2. 选择音色（清澈少年 / 甜美女声 / 甜美少女）
+3. 调整语速（0.5x ~ 2.0x）
+4. 点击「✦ 开始合成语音」或按 `Ctrl + Enter`
+5. 合成完成后可播放、下载或复制链接
+
+### 提示词画廊
+- 搜索关键词可实时筛选
+- 点击分类标签按类别过滤
+- 点击卡片查看完整提示词
+- 使用「中文」或「英文」按钮一键填入图片生成区
+
+> 所有生成记录保存在浏览器本地 localStorage，最多保留 30 条。
 
 ## API 接口
 
@@ -133,3 +175,72 @@ npm start
 ### 冷启动说明
 
 Render 免费套餐在 15 分钟无活动后会进入休眠，下次访问时会有约 30 秒的冷启动延迟，这是正常现象。
+
+---
+
+## 生产部署检查清单
+
+每次部署后，请按以下清单确认服务正常运行：
+
+### 1. Health Check 验证
+
+部署完成后，GitHub Actions 会自动通过 `curl` 请求 `/api/key-status` 验证服务可用性。
+
+手动验证：
+
+```bash
+curl https://minimax-image-generator.onrender.com/api/key-status
+# 期望响应: {"configured": true}
+```
+
+### 2. API Key 配置确认
+
+确认 `MINIMAX_API_KEY` 环境变量已正确设置：
+
+- 登录 [Render Dashboard](https://dashboard.render.com)
+- 进入 Web Service → Environment → Secrets
+- 确认 `MINIMAX_API_KEY` 存在且值正确（不要暴露到日志）
+
+### 3. CI/CD Commit Status 检查
+
+GitHub Actions 会在每次部署后更新 commit status：
+
+- `CI (Lint + Test + Build)` — 必须通过（红色 = 有问题）
+- `render/deploy` — 部署结果（绿色 = 成功，红色 = 失败）
+- 查看失败的 Action 日志确认具体错误原因
+
+### 4. 监控配置建议
+
+**Render 内置监控**：
+- Render Dashboard → Metrics — 查看 QPS、延迟、错误率
+- 设置 Alert 阈值（Request Error Rate > 5% 时通知）
+
+**关键指标**：
+| 指标 | 正常范围 | 告警阈值 |
+|------|---------|---------|
+| HTTP 2xx 比例 | > 95% | < 90% |
+| 平均响应时间 | < 3s | > 10s |
+| 冷启动延迟 | < 60s | > 120s |
+
+**日志查看**：
+- Render Dashboard → Logs — 实时查看应用日志
+- 关注 `[ERROR]` 和 `[WARN]` 关键字
+
+### 5. 安全检查
+
+- [ ] API Key 仅存储在 Render Secrets，未泄露到代码或日志
+- [ ] `npm audit` 无高危漏洞（CI 会自动检查）
+- [ ] Dependabot PR 及时处理（依赖保持最新）
+
+### 6. prompts.json 维护
+
+`public/prompts.json` 已纳入版本控制，由 `parse_prompts.js` 脚本生成。
+
+如需更新提示词库：
+```bash
+# 编辑 prompts/ 目录中的 .md 文件
+node parse_prompts.js          # 重新生成 public/prompts.json
+git add public/prompts.json
+git commit -m "chore: update prompts"
+git push                       # 触发 CI/CD 重新部署
+```

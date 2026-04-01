@@ -1,0 +1,43 @@
+version: 2
+updates:
+  # Enable version updates for npm packages
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore"
+      include: scope
+    labels:
+      - "dependencies"
+    reviewers:
+      - huaangdou-afk
+    ignore:
+      # Keep the pinned major version range for axios to avoid breaking changes
+      - dependency-name: axios
+        update-types: ["version-update:semver-major"]
+      # helmet updates may contain security policy changes
+      - dependency-name: helmet
+        update-types: ["version-update:semver-major"]
+
+  # Enable GitHub Actions version updates
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Shanghai
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+      include: scope
+    labels:
+      - "ci"
+      - "dependencies"
+    reviewers:
+      - huaangdou-afk

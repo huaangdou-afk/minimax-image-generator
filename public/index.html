@@ -6,262 +6,8 @@
   <title>MiniMax AI 生成器</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg-base: #07070e;
-      --bg-surface: #0e0e1a;
-      --bg-elevated: #14141f;
-      --bg-hover: #1a1a28;
-      --bg-active: #1f1f2e;
-      --border: rgba(255,255,255,0.07);
-      --border-subtle: rgba(255,255,255,0.04);
-      --border-accent: rgba(139,92,246,0.35);
-      --accent: #8b5cf6;
-      --accent-dim: rgba(139,92,246,0.15);
-      --accent-glow: rgba(139,92,246,0.25);
-      --accent-hover: #7c3aed;
-      --accent-cyan: #06b6d4;
-      --text-primary: #ededf0;
-      --text-secondary: #8b8999;
-      --text-muted: #44445a;
-      --text-accent: #a78bfa;
-      --success: #34d399;
-      --success-dim: rgba(52,211,153,0.12);
-      --error: #f87171;
-      --error-dim: rgba(248,113,113,0.12);
-      --warning: #fbbf24;
-      --radius-xs: 4px;
-      --radius-sm: 6px;
-      --radius: 10px;
-      --radius-lg: 14px;
-      --radius-xl: 20px;
-      --sidebar-w: 220px;
-      --header-h: 56px;
-      --font-sans: 'Noto Sans SC', 'Space Grotesk', system-ui, sans-serif;
-      --font-mono: 'Space Grotesk', ui-monospace, monospace;
-    }
-
-    html, body { height: 100%; font-family: var(--font-sans); background: var(--bg-base); color: var(--text-primary); font-size: 14px; -webkit-font-smoothing: antialiased; }
-    html { scroll-behavior: smooth; }
-    body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 90% 50% at 50% -10%, rgba(139,92,246,0.07) 0%, transparent 55%), radial-gradient(ellipse 50% 30% at 85% 50%, rgba(6,182,212,0.04) 0%, transparent 50%); pointer-events: none; z-index: 0; }
-
-    /* ── Layout ─────────────────────────────────────── */
-    .layout { display: grid; grid-template-columns: var(--sidebar-w) 1fr; grid-template-rows: var(--header-h) 1fr; min-height: 100vh; position: relative; z-index: 1; }
-
-    /* ── Header ─────────────────────────────────────── */
-    .header { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 24px 0 0; border-bottom: 1px solid var(--border-subtle); background: rgba(7,7,14,0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100; }
-    .header-logo { display: flex; align-items: center; gap: 10px; width: var(--sidebar-w); padding: 0 20px; border-right: 1px solid var(--border-subtle); height: var(--header-h); }
-    .header-logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), var(--accent-cyan)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; flex-shrink: 0; box-shadow: 0 0 16px rgba(139,92,246,0.35); }
-    .header-logo-text { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.02em; }
-    .header-center { flex: 1; display: flex; align-items: center; gap: 16px; padding-left: 24px; }
-    .header-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
-    .header-status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
-    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 6px var(--success); animation: pulse-dot 2s ease-in-out infinite; }
-    @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
-    /* ── Sidebar ────────────────────────────────────── */
-    .sidebar { grid-column: 1; grid-row: 2; border-right: 1px solid var(--border-subtle); padding: 16px 10px; display: flex; flex-direction: column; gap: 2px; position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); overflow-y: auto; }
-    .sidebar-section { margin-bottom: 8px; }
-    .sidebar-section-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 6px 10px 4px; }
-    .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--radius-sm); color: var(--text-secondary); cursor: pointer; transition: all 0.15s; font-size: 13px; font-weight: 450; border: none; background: none; width: 100%; text-align: left; font-family: inherit; position: relative; }
-    .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
-    .nav-item.active { background: var(--accent-dim); color: var(--text-accent); }
-    .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 2px; height: 16px; background: var(--accent); border-radius: 0 2px 2px 0; }
-    .nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
-    .nav-badge { margin-left: auto; font-size: 10px; background: var(--bg-elevated); color: var(--text-muted); padding: 1px 6px; border-radius: 10px; border: 1px solid var(--border); font-family: var(--font-mono); }
-
-    /* ── Content ────────────────────────────────────── */
-    .content { grid-column: 2; grid-row: 2; padding: 24px; overflow-y: auto; min-height: calc(100vh - var(--header-h)); }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: flex; flex-direction: column; gap: 20px; }
-
-    /* ── Cards ──────────────────────────────────────── */
-    .panel { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
-    .panel-header { padding: 16px 20px 14px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
-    .panel-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-secondary); }
-    .panel-title::before { content: ''; width: 3px; height: 12px; background: var(--accent); border-radius: 2px; }
-    .panel-body { padding: 20px; }
-
-    /* ── Image Generation Layout ────────────────────── */
-    .gen-layout { display: grid; grid-template-columns: 1fr 360px; gap: 20px; align-items: start; }
-    .gen-layout .right-panel { display: flex; flex-direction: column; gap: 16px; }
-
-    /* ── Image Display ──────────────────────────────── */
-    .img-preview { width: 100%; aspect-ratio: 1; background: var(--bg-base); border-radius: var(--radius); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; position: relative; overflow: hidden; border: 1px solid var(--border-subtle); transition: border-color 0.2s; }
-    .img-preview.has-image { border-color: var(--border); }
-    .img-preview .placeholder-icon { font-size: 40px; opacity: 0.2; }
-    .img-preview .placeholder-text { color: var(--text-muted); font-size: 13px; text-align: center; line-height: 1.7; }
-    .img-preview .placeholder-text small { display: block; font-size: 11px; margin-top: 4px; opacity: 0.6; }
-    .img-preview img { width: 100%; height: 100%; object-fit: contain; display: block; }
-    .img-loading { position: absolute; inset: 0; background: rgba(7,7,14,0.88); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; border-radius: var(--radius); }
-    .img-loading-text { font-size: 13px; color: var(--text-secondary); }
-    .spinner { width: 36px; height: 36px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes dotPulse { 0%, 80%, 100% { opacity: 0.3; } 40% { opacity: 1; } }
-    .dot { animation: dotPulse 1.4s infinite; display: inline-block; }
-    .dot:nth-child(2) { animation-delay: 0.2s; }
-    .dot:nth-child(3) { animation-delay: 0.4s; }
-    .img-skeleton { position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-hover) 50%, var(--bg-elevated) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius); }
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-    .img-meta { padding: 12px 0 0; display: flex; align-items: center; gap: 8px; }
-    .img-meta-time { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
-    .img-actions { display: flex; gap: 6px; margin-left: auto; opacity: 0; transition: opacity 0.2s; }
-    .img-actions.visible { opacity: 1; }
-
-    /* ── Buttons ────────────────────────────────────── */
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius-sm); border: 1px solid transparent; font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; outline: none; position: relative; }
-    .btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-    .btn-ghost { background: transparent; border-color: var(--border); color: var(--text-secondary); }
-    .btn-ghost:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-primary); border-color: rgba(255,255,255,0.12); }
-    .btn-icon { padding: 7px 9px; }
-    .btn-sm { padding: 5px 10px; font-size: 11px; }
-    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); flex: 1; padding: 11px 16px; font-size: 13px; letter-spacing: 0.02em; box-shadow: 0 0 20px rgba(139,92,246,0.2); }
-    .btn-primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); box-shadow: 0 0 28px rgba(139,92,246,0.35); transform: translateY(-1px); }
-    .btn-primary:active:not(:disabled) { transform: translateY(0); }
-    .btn-primary.loading { pointer-events: none; }
-
-    /* ── Prompt Input ───────────────────────────────── */
-    textarea { width: 100%; background: var(--bg-base); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; color: var(--text-primary); font-family: inherit; font-size: 13px; line-height: 1.7; resize: vertical; min-height: 100px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-    textarea::placeholder { color: var(--text-muted); }
-    textarea:focus { border-color: var(--border-accent); box-shadow: 0 0 0 3px var(--accent-dim); }
-    .prompt-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
-
-    /* ── Preset Tags ───────────────────────────────── */
-    .preset-scroll { display: flex; flex-wrap: wrap; gap: 6px; max-height: 180px; overflow-y: auto; padding-right: 4px; }
-    .preset-tag { padding: 5px 12px; border-radius: 20px; background: var(--bg-base); border: 1px solid var(--border); color: var(--text-secondary); font-size: 11px; cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap; }
-    .preset-tag:hover { background: var(--accent-dim); border-color: var(--border-accent); color: var(--text-accent); }
-    .preset-tag.active { background: var(--accent-dim); border-color: var(--border-accent); color: var(--text-accent); }
-
-    /* ── Settings ───────────────────────────────────── */
-    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .setting-item { display: flex; flex-direction: column; gap: 7px; }
-    .setting-item.full { grid-column: 1 / -1; }
-    .setting-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
-    select, input[type="text"], input[type="number"] { background: var(--bg-base); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 12px; color: var(--text-primary); font-family: inherit; font-size: 12px; outline: none; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; }
-    input[type="number"] { font-family: var(--font-mono); }
-    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2344445a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
-    input:hover, select:hover { border-color: rgba(255,255,255,0.12); }
-    input:focus, select:focus { border-color: var(--border-accent); box-shadow: 0 0 0 3px var(--accent-dim); }
-    .slider-row { display: flex; align-items: center; gap: 10px; }
-    .setting-slider { -webkit-appearance: none; flex: 1; height: 3px; border-radius: 2px; background: var(--bg-elevated); outline: none; cursor: pointer; border: none; padding: 0; }
-    .setting-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 8px rgba(139,92,246,0.4); border: 2px solid var(--bg-base); }
-    .slider-val { font-size: 11px; color: var(--text-accent); font-family: var(--font-mono); white-space: nowrap; min-width: 28px; text-align: right; }
-    .seed-row { display: flex; gap: 8px; align-items: center; }
-    .seed-row input { flex: 1; }
-
-    /* ── History ────────────────────────────────────── */
-    .history-scroll { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-height: 200px; overflow-y: auto; padding-right: 2px; }
-    .history-item { aspect-ratio: 1; border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; position: relative; border: 1px solid var(--border-subtle); transition: all 0.15s; background: var(--bg-base); }
-    .history-item:hover { border-color: var(--border-accent); transform: scale(1.04); }
-    .history-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .history-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s; font-size: 18px; }
-    .history-item:hover .history-overlay { opacity: 1; }
-    .history-empty { grid-column: 1 / -1; text-align: center; padding: 28px; color: var(--text-muted); font-size: 12px; }
-
-    /* ── TTS Panel ─────────────────────────────────── */
-    .tts-layout { display: grid; grid-template-columns: 1fr 360px; gap: 20px; align-items: start; }
-    .tts-layout .right-panel { display: flex; flex-direction: column; gap: 16px; }
-    .tts-preview-area { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 280px; gap: 16px; color: var(--text-muted); }
-    .tts-preview-area .placeholder-icon { font-size: 40px; opacity: 0.2; }
-    .tts-preview-area .placeholder-text { font-size: 13px; line-height: 1.7; text-align: center; }
-    .tts-preview-area .placeholder-text small { display: block; font-size: 11px; margin-top: 4px; opacity: 0.6; }
-    .tts-player-area { display: flex; flex-direction: column; gap: 14px; }
-    .tts-text-preview { font-size: 13px; line-height: 1.7; color: var(--text-secondary); word-break: break-word; max-height: 100px; overflow-y: auto; padding-right: 4px; }
-    .tts-waveform { display: flex; align-items: center; gap: 3px; height: 40px; padding: 0 4px; }
-    .wave-bar { flex: 1; background: var(--accent-dim); border-radius: 2px; min-height: 3px; }
-    .tts-audio { width: 100%; height: 40px; border-radius: var(--radius); outline: none; }
-    .tts-actions { display: flex; gap: 8px; }
-
-    /* ── Voice Grid ────────────────────────────────── */
-    .voice-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .voice-btn { padding: 10px 6px; background: var(--bg-base); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-secondary); font-size: 11px; font-family: inherit; cursor: pointer; text-align: center; transition: all 0.15s; line-height: 1.5; }
-    .voice-btn:hover { border-color: var(--border-accent); color: var(--text-accent); background: var(--accent-dim); }
-    .voice-btn.active { border-color: var(--accent); color: var(--text-accent); background: var(--accent-dim); box-shadow: 0 0 12px rgba(139,92,246,0.15); }
-
-    /* ── Gallery ───────────────────────────────────── */
-    .gallery-toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .gallery-search { flex: 1; min-width: 200px; background: var(--bg-base); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; color: var(--text-primary); font-family: inherit; font-size: 13px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-    .gallery-search::placeholder { color: var(--text-muted); }
-    .gallery-search:focus { border-color: var(--border-accent); box-shadow: 0 0 0 3px var(--accent-dim); }
-    .gallery-cat-filters { display: flex; gap: 6px; flex-wrap: wrap; }
-    .gallery-cat-btn { padding: 5px 12px; border-radius: 20px; background: var(--bg-base); border: 1px solid var(--border); color: var(--text-secondary); font-size: 11px; font-family: inherit; cursor: pointer; transition: all 0.15s; }
-    .gallery-cat-btn:hover { border-color: var(--border-accent); color: var(--text-accent); }
-    .gallery-cat-btn.active { background: var(--accent-dim); border-color: var(--border-accent); color: var(--text-accent); }
-    .gallery-count { font-size: 12px; color: var(--text-muted); }
-    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; max-height: 65vh; overflow-y: auto; padding-right: 4px; }
-    .gallery-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: all 0.15s; display: flex; flex-direction: column; gap: 10px; }
-    .gallery-card:hover { border-color: var(--border-accent); background: var(--bg-hover); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-    .gallery-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-    .gallery-card-title { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.4; flex: 1; }
-    .gallery-card-id { font-size: 10px; color: var(--text-muted); white-space: nowrap; font-family: var(--font-mono); margin-top: 2px; }
-    .gallery-card-cats { display: flex; gap: 4px; flex-wrap: wrap; }
-    .gallery-cat-tag { padding: 2px 8px; border-radius: 10px; font-size: 10px; white-space: nowrap; }
-    .gallery-card-preview { font-size: 12px; color: var(--text-secondary); line-height: 1.6; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-    .gallery-card-use { display: flex; gap: 6px; opacity: 0; transition: opacity 0.15s; }
-    .gallery-card:hover .gallery-card-use { opacity: 1; }
-    .gallery-use-btn { flex: 1; padding: 6px 10px; border-radius: var(--radius-xs); border: none; background: var(--accent); color: #fff; font-size: 11px; font-family: inherit; cursor: pointer; transition: background 0.15s; }
-    .gallery-use-btn:hover { background: var(--accent-hover); }
-    .gallery-use-cn, .gallery-use-en { flex: 1; padding: 6px 10px; border-radius: var(--radius-xs); border: 1px solid var(--border); background: transparent; color: var(--text-secondary); font-size: 11px; font-family: inherit; cursor: pointer; transition: all 0.15s; }
-    .gallery-use-cn:hover, .gallery-use-en:hover { border-color: var(--border-accent); color: var(--text-accent); }
-
-    /* ── Gallery Modal ──────────────────────────────── */
-    .gallery-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
-    .gallery-modal.open { display: flex; }
-    .gallery-modal-content { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 28px; max-width: 640px; width: 100%; max-height: 85vh; overflow-y: auto; }
-    .gallery-modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; gap: 16px; }
-    .gallery-modal-title { font-size: 16px; font-weight: 600; color: var(--text-primary); }
-    .gallery-modal-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-family: var(--font-mono); }
-    .gallery-modal-close { background: var(--bg-hover); border: 1px solid var(--border); color: var(--text-secondary); width: 30px; height: 30px; border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
-    .gallery-modal-close:hover { background: var(--bg-active); color: var(--text-primary); }
-    .gallery-modal-prompt { background: var(--bg-base); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; font-size: 13px; line-height: 1.8; color: var(--text-secondary); white-space: pre-wrap; word-break: break-all; max-height: 280px; overflow-y: auto; margin-bottom: 16px; }
-    .gallery-modal-actions { display: flex; gap: 8px; }
-    .gallery-modal-actions .btn { flex: 1; }
-    .gallery-loading { text-align: center; padding: 60px; color: var(--text-muted); font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
-
-    /* ── Toast ─────────────────────────────────────── */
-    .toast { position: fixed; bottom: 28px; right: 28px; background: var(--bg-elevated); border: 1px solid var(--error); color: var(--error); padding: 12px 20px; border-radius: var(--radius); font-size: 13px; z-index: 500; transform: translateY(80px); opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-    .toast.show { transform: translateY(0); opacity: 1; }
-    .toast.success { border-color: var(--success); color: var(--success); }
-
-    /* ── Mobile Bottom Nav ──────────────────────────── */
-    .mobile-nav { display: none; }
-
-    /* ── Scrollbars ────────────────────────────────── */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.1); }
-
-    /* ── Responsive ─────────────────────────────────── */
-    @media (max-width: 900px) {
-      :root { --sidebar-w: 0px; }
-      .layout { grid-template-columns: 1fr; grid-template-rows: var(--header-h) 1fr auto; }
-      .header { grid-column: 1; }
-      .header-logo { width: auto; border-right: none; padding: 0 16px 0 0; }
-      .header-logo-text { display: none; }
-      .sidebar { display: none; }
-      .content { grid-column: 1; padding: 16px; }
-      .mobile-nav { display: flex; grid-row: 3; position: sticky; bottom: 0; background: rgba(7,7,14,0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border-subtle); z-index: 50; padding: 6px 0 env(safe-area-inset-bottom, 8px); }
-      .mobile-nav-items { display: flex; width: 100%; }
-      .mobile-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 10px; font-family: inherit; transition: color 0.15s; }
-      .mobile-nav-item.active { color: var(--text-accent); }
-      .mobile-nav-item .nav-icon { font-size: 18px; }
-      .gen-layout, .tts-layout { grid-template-columns: 1fr; }
-      .gallery-grid { grid-template-columns: 1fr; }
-      .gallery-toolbar { flex-direction: column; }
-      .gallery-search { min-width: unset; width: 100%; }
-      .history-scroll { grid-template-columns: repeat(4, 1fr); }
-    }
-
-    @media (max-width: 480px) {
-      .content { padding: 12px; }
-      .panel-body { padding: 14px; }
-      .settings-grid { grid-template-columns: 1fr; }
-      .voice-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-  </style>
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/components.css" />
 </head>
 <body>
 <div class="layout">
@@ -333,10 +79,10 @@
           <div class="panel">
             <div class="panel-header"><div class="panel-title">提示词</div></div>
             <div class="panel-body">
-              <textarea id="imgPrompt" placeholder="描述你想要的图片内容，例如：一只可爱的橘猫在阳光下打盹，奇幻风格，超高画质"></textarea>
+              <textarea id="imgPrompt" placeholder="描述你想要的图片内容，例如：一只可爱的橘猫在阳光下打盹，奇幻风格，超高画质" aria-label="图片提示词"></textarea>
               <div class="prompt-footer">
                 <span>支持中文描述</span>
-                <span id="imgCharCount">0 / 2000</span>
+                <span id="imgCharCount">0 / 1500</span>
               </div>
             </div>
           </div>
@@ -413,6 +159,9 @@
             </div>
             <div class="panel-body">
               <div class="history-scroll" id="imgHistoryList"><div class="history-empty">暂无历史记录</div></div>
+              <div class="history-footer" id="historyFooter" style="display:none;">
+                <button class="history-clear-btn" id="btnClearHistory">🗑 清空历史</button>
+              </div>
             </div>
           </div>
         </div>
@@ -505,7 +254,7 @@
           </div>
           <div class="gallery-cat-filters" id="galleryCatFilters"></div>
           <div class="gallery-count" id="galleryCount">加载中...</div>
-          <div class="gallery-grid" id="galleryGrid"><div class="gallery-loading"><div class="spinner"></div><div>提示词加载中<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div></div>
+          <div class="gallery-grid" id="galleryGrid"><div class="gallery-loading"><div style="width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;"></div><div>提示词加载中<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div></div>
         </div>
       </div>
     </div>
@@ -550,29 +299,46 @@
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- Image Preview Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="图片预览">
+  <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+  <div class="lightbox-content">
+    <button class="lightbox-close" id="lightboxClose" aria-label="关闭">✕</button>
+    <img class="lightbox-img" id="lightboxImg" src="" alt="Full size preview"/>
+    <div class="lightbox-footer">
+      <button class="btn btn-ghost btn-sm" id="lightboxDownload">⬇ 下载原图</button>
+      <button class="btn btn-ghost btn-sm" id="lightboxCopy">📋 复制链接</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
 
 <script>
-// =====================
-// Config & API (backend proxy mode — no user API key needed)
-// =====================
-const API_BASE_IMG = '/api/generate';
-const API_BASE_TTS = '/api/tts';
-
-function showToast(msg, type) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast' + (type === 'success' ? ' success' : '');
-  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+// ============================================================
+// Service Worker Registration (caches static assets)
+// ============================================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('[SW] Registered:', reg.scope);
+    }).catch(err => {
+      console.warn('[SW] Registration failed (non-fatal):', err);
+    });
+  });
 }
+
+// ============================================================
+// Utilities
+// ============================================================
 function escapeHtml(s) {
   if (typeof s !== 'string') return '';
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 function parseSize(r) {
   const [w,h] = r.split(':').map(Number);
-  const max = 1024;
-  const gcd = (a,b) => b===0?a:gcd(b,a%b);
-  return { width: max, height: Math.round(max * h / w) };
+  return { width: 1024, height: Math.round(1024 * h / w) };
 }
 async function apiCall(url, body) {
   const res = await fetch(url, {
@@ -581,13 +347,55 @@ async function apiCall(url, body) {
     body: JSON.stringify(body),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+  if (!res.ok) throw new Error(data.error || `请求失败 (${res.status})`);
   return data;
 }
 
-// =====================
+// Generic debounce helper
+function debounce(fn, delay) {
+  let timer = null;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+// ============================================================
+// Toast Notification System
+// ============================================================
+const toastContainer = document.getElementById('toastContainer');
+const TOAST_ICONS = { error: '⚠', success: '✅', warning: '⚡' };
+
+function showToast(msg, type = 'error', duration = 3500) {
+  const toast = document.createElement('div');
+  toast.className = 'toast' + (type === 'success' ? ' success' : type === 'warning' ? ' warning' : '');
+  toast.innerHTML =
+    '<span class="toast-icon">' + TOAST_ICONS[type] + '</span>' +
+    '<span class="toast-msg">' + escapeHtml(msg) + '</span>' +
+    '<button class="toast-close" aria-label="关闭">✕</button>';
+  toastContainer.appendChild(toast);
+
+  // Double rAF to ensure CSS transition picks up the new class
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => toast.classList.add('show'));
+  });
+
+  const autoHide = setTimeout(() => dismissToast(toast), duration);
+  toast.querySelector('.toast-close').addEventListener('click', () => {
+    clearTimeout(autoHide);
+    dismissToast(toast);
+  });
+}
+
+function dismissToast(toast) {
+  if (!toast.classList.contains('show')) return;
+  toast.classList.remove('show');
+  toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+}
+
+// ============================================================
 // Tabs (sidebar + mobile nav)
-// =====================
+// ============================================================
 function activateTab(tabName) {
   document.querySelectorAll('.nav-item[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
   document.querySelectorAll('.mobile-nav-item[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
@@ -597,44 +405,105 @@ document.querySelectorAll('.nav-item[data-tab], .mobile-nav-item[data-tab]').for
   btn.addEventListener('click', () => activateTab(btn.dataset.tab));
 });
 
-// =====================
+// ============================================================
 // Image Generation
-// =====================
-const imgPrompt = document.getElementById('imgPrompt');
-const imgCharCount = document.getElementById('imgCharCount');
-const presetTags = document.getElementById('presetTags');
-const imgSize = document.getElementById('imgSize');
-const imgSeed = document.getElementById('imgSeed');
-const btnRandomSeed = document.getElementById('btnRandomSeed');
-const btnGenerateImg = document.getElementById('btnGenerateImg');
-const imageDisplay = document.getElementById('imageDisplay');
-const imageActions = document.getElementById('imageActions');
-const btnDownload = document.getElementById('btnDownload');
-const btnCopy = document.getElementById('btnCopy');
-const btnDelete = document.getElementById('btnDelete');
-const imgHistoryList = document.getElementById('imgHistoryList');
-const imgGenTime = document.getElementById('imgGenTime');
+// ============================================================
+const imgPrompt       = document.getElementById('imgPrompt');
+const imgCharCount    = document.getElementById('imgCharCount');
+const presetTags      = document.getElementById('presetTags');
+const imgSize         = document.getElementById('imgSize');
+const imgSeed         = document.getElementById('imgSeed');
+const btnRandomSeed   = document.getElementById('btnRandomSeed');
+const btnGenerateImg  = document.getElementById('btnGenerateImg');
+const imageDisplay    = document.getElementById('imageDisplay');
+const imageActions    = document.getElementById('imageActions');
+const btnDownload     = document.getElementById('btnDownload');
+const btnCopy         = document.getElementById('btnCopy');
+const btnDelete       = document.getElementById('btnDelete');
+const imgHistoryList  = document.getElementById('imgHistoryList');
+const imgGenTime      = document.getElementById('imgGenTime');
 const imgHistoryCount = document.getElementById('imgHistoryCount');
+const historyFooter   = document.getElementById('historyFooter');
+
 let currentImageUrl = null;
-let imgHistory = JSON.parse(localStorage.getItem('imgGenHistory') || '[]');
+let isGenerating    = false;
 
-imgPrompt.addEventListener('input', () => { imgCharCount.textContent = imgPrompt.value.length + ' / 2000'; });
-presetTags.addEventListener('click', e => {
-  const t = e.target.closest('.preset-tag');
-  if (!t) return;
-  document.querySelectorAll('.preset-tag').forEach(x => x.classList.remove('active'));
-  t.classList.add('active');
-  imgPrompt.value = t.dataset.prompt;
-  imgCharCount.textContent = imgPrompt.value.length + ' / 2000';
-  imgPrompt.focus();
+// ── History (localStorage, max 20, dedup) ──
+const HISTORY_KEY = 'imgGenHistory';
+const MAX_HISTORY  = 20;
+let imgHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+
+function saveHistory() {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(imgHistory));
+}
+
+function addToHistory(url) {
+  // Remove if already exists (so it moves to front)
+  imgHistory = imgHistory.filter(u => u !== url);
+  imgHistory.unshift(url);
+  if (imgHistory.length > MAX_HISTORY) imgHistory = imgHistory.slice(0, MAX_HISTORY);
+  saveHistory();
+  renderImgHistory();
+}
+
+function clearHistory() {
+  imgHistory = [];
+  saveHistory();
+  renderImgHistory();
+  showToast('历史记录已清空', 'success');
+}
+
+function renderImgHistory() {
+  const count = imgHistory.length;
+  imgHistoryCount.textContent = count > 0 ? count + ' 张' : '';
+  historyFooter.style.display = count > 0 ? '' : 'none';
+
+  if (count === 0) {
+    imgHistoryList.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+    return;
+  }
+
+  imgHistoryList.innerHTML = imgHistory.map(u =>
+    '<div class="history-item" data-url="' + escapeHtml(u) + '">' +
+      '<img src="' + escapeHtml(u) + '" alt="h" loading="lazy"/>' +
+      '<div class="history-overlay">👁</div>' +
+    '</div>'
+  ).join('');
+
+  // Progressive image load for history thumbnails
+  imgHistoryList.querySelectorAll('img').forEach(img => {
+    if (img.complete) { img.classList.add('loaded'); }
+    else { img.addEventListener('load', () => img.classList.add('loaded')); }
+  });
+}
+
+document.getElementById('btnClearHistory').addEventListener('click', e => {
+  e.stopPropagation();
+  clearHistory();
 });
-btnRandomSeed.addEventListener('click', () => { imgSeed.value = Math.floor(Math.random() * 999999999); });
 
+renderImgHistory();
+
+// ── Image render with progressive reveal ──
 function renderImage(url, fromHistory) {
   imageDisplay.innerHTML = '';
+  imageDisplay.classList.remove('has-image');
+  imageActions.classList.remove('visible');
+
+  // 1. Skeleton shimmer while loading
+  const skeleton = document.createElement('div');
+  skeleton.className = 'img-skeleton';
+  imageDisplay.appendChild(skeleton);
+
+  // 2. Main image (starts invisible)
   const img = document.createElement('img');
-  img.src = url; img.alt = 'Generated';
+  img.src = url;
+  img.alt = 'Generated';
+  imageDisplay.appendChild(img);
+
   img.onload = () => {
+    skeleton.remove();
+    img.classList.add('loaded');
     imageDisplay.classList.add('has-image');
     imageActions.classList.add('visible');
     if (!fromHistory) {
@@ -642,38 +511,114 @@ function renderImage(url, fromHistory) {
       imgGenTime.textContent = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
   };
-  imageDisplay.appendChild(img);
+  img.onerror = () => {
+    skeleton.remove();
+    img.remove();
+    imageDisplay.innerHTML =
+      '<div class="img-error">' +
+        '<div class="img-error-icon">⚠</div>' +
+        '<div class="img-error-text">图片加载失败，可能是链接已过期</div>' +
+        '<button class="img-error-retry" id="btnRetry">🔄 重试</button>' +
+      '</div>';
+    document.getElementById('btnRetry').addEventListener('click', () => generateImage());
+    imageDisplay.classList.remove('has-image');
+  };
+
   currentImageUrl = url;
   if (!fromHistory) addToHistory(url);
 }
-function showLoadingImg() {
-  imageDisplay.innerHTML = '<div class="img-loading"><div class="spinner"></div><div class="img-loading-text">AI 正在生成图片<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div>';
-  imageDisplay.classList.remove('has-image'); imageActions.classList.remove('visible');
+
+// ── Loading overlay ──
+function showLoadingOverlay() {
+  imageDisplay.querySelectorAll('.gen-loading-overlay, .img-skeleton, .img-error').forEach(el => el.remove());
+  imageDisplay.classList.remove('has-image');
+  imageActions.classList.remove('visible');
+  imageDisplay.innerHTML =
+    '<div class="gen-loading-overlay">' +
+      '<div class="gen-loading-spinner"></div>' +
+      '<div class="gen-loading-text">' +
+        'AI 正在生成图片' +
+        '<span class="gen-loading-dots"><span>.</span><span>.</span><span>.</span></span>' +
+        '<em>预计需要 5-15 秒</em>' +
+      '</div>' +
+    '</div>';
 }
+
+// ── Core generation function ──
 async function generateImage() {
+  if (isGenerating) return;
+
   const prompt = imgPrompt.value.trim();
-  if (!prompt) { showToast('请输入提示词'); imgPrompt.focus(); return; }
-  if (prompt.length > 1500) { showToast('提示词不能超过1500字'); return; }
-  const size = parseSize(imgSize.value);
-  btnGenerateImg.disabled = true; btnGenerateImg.textContent = '⏳ 生成中...';
+  if (!prompt) { showToast('请输入提示词', 'warning'); imgPrompt.focus(); return; }
+  if (prompt.length > 1500) { showToast('提示词不能超过 1500 字', 'warning'); return; }
+
+  isGenerating = true;
+  btnGenerateImg.disabled = true;
+  btnGenerateImg.innerHTML = '<span class="btn-spinner"></span> 生成中...';
   btnGenerateImg.classList.add('loading');
-  showLoadingImg();
+  showLoadingOverlay();
+
   try {
-    const data = await apiCall(API_BASE_IMG, { model: 'image-01', prompt, width: size.width, height: size.height });
+    const size = parseSize(imgSize.value);
+    const seed = imgSeed.value ? parseInt(imgSeed.value) : undefined;
+    const body = { model: 'image-01', prompt, width: size.width, height: size.height };
+    if (seed) body.seed = seed;
+
+    const data = await apiCall('/api/generate', body);
     const url = data.image_url;
-    if (!url) throw new Error('No image URL returned');
+    if (!url) throw new Error('未返回图片地址');
+
     renderImage(url);
+    showToast('图片生成成功！', 'success');
   } catch(err) {
-    imageDisplay.innerHTML = '<div style="text-align:center;color:var(--error);padding:20px;"><div style="font-size:36px;margin-bottom:8px;">⚠</div><div style="font-size:13px;">' + err.message + '</div></div>';
-    imageDisplay.classList.remove('has-image');
+    imageDisplay.querySelectorAll('.gen-loading-overlay, .img-skeleton').forEach(el => el.remove());
+    imageDisplay.innerHTML =
+      '<div class="img-error">' +
+        '<div class="img-error-icon">⚠</div>' +
+        '<div class="img-error-text">' + escapeHtml(err.message) + '</div>' +
+        '<button class="img-error-retry" id="btnRetry">🔄 重试</button>' +
+      '</div>';
+    document.getElementById('btnRetry').addEventListener('click', () => generateImage());
   } finally {
-    btnGenerateImg.disabled = false; btnGenerateImg.textContent = '✦ 开始生成图片';
+    isGenerating = false;
+    btnGenerateImg.disabled = false;
+    btnGenerateImg.innerHTML = '✦ 开始生成图片';
     btnGenerateImg.classList.remove('loading');
   }
 }
-btnGenerateImg.addEventListener('click', generateImage);
-imgPrompt.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter') generateImage(); });
 
+// Debounced click handler (300ms) to prevent rapid-fire submissions
+const debouncedGenerate = debounce(generateImage, 300);
+
+btnGenerateImg.addEventListener('click', debouncedGenerate);
+imgPrompt.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); debouncedGenerate(); }
+});
+
+// Character counter with overflow warning color
+imgPrompt.addEventListener('input', () => {
+  const len = imgPrompt.value.length;
+  imgCharCount.textContent = len + ' / 1500';
+  imgCharCount.style.color = len > 1500 ? 'var(--warning)' : '';
+});
+
+// Preset tags
+presetTags.addEventListener('click', e => {
+  const t = e.target.closest('.preset-tag');
+  if (!t) return;
+  document.querySelectorAll('.preset-tag').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  imgPrompt.value = t.dataset.prompt;
+  imgCharCount.textContent = t.dataset.prompt.length + ' / 1500';
+  imgPrompt.focus();
+});
+
+btnRandomSeed.addEventListener('click', () => {
+  imgSeed.value = Math.floor(Math.random() * 999999999);
+  showToast('已生成随机种子', 'success');
+});
+
+// Download (new tab)
 btnDownload.addEventListener('click', async () => {
   if (!currentImageUrl) return;
   const a = document.createElement('a');
@@ -681,134 +626,225 @@ btnDownload.addEventListener('click', async () => {
   a.download = 'ai-image-' + Date.now() + '.jpg';
   a.target = '_blank';
   a.click();
-  showToast('图片已在新窗口打开，右键另存为即可', 'success');
+  showToast('已在新窗口打开，右键另存为', 'success');
 });
+
+// Copy link
 btnCopy.addEventListener('click', () => {
   if (!currentImageUrl) return;
-  navigator.clipboard.writeText(currentImageUrl).then(() => showToast('图片地址已复制', 'success')).catch(() => showToast('复制失败'));
+  navigator.clipboard.writeText(currentImageUrl)
+    .then(() => showToast('图片地址已复制', 'success'))
+    .catch(() => showToast('复制失败，请手动复制'));
 });
-btnDelete.addEventListener('click', () => {
-  imageDisplay.innerHTML = '<div class="placeholder-icon">🎨</div><div class="placeholder-text">输入提示词开始生成<br/><small>生成的图片将显示在这里</small></div>';
-  imageDisplay.classList.remove('has-image'); imageActions.classList.remove('visible'); currentImageUrl = null; imgGenTime.textContent = '';
+
+// ── Image Preview Lightbox ──
+const lightbox      = document.getElementById('lightbox');
+const lightboxImg   = document.getElementById('lightboxImg');
+const lightboxClose = document.getElementById('lightboxClose');
+const lightboxBackdrop = document.getElementById('lightboxBackdrop');
+const lightboxDownload = document.getElementById('lightboxDownload');
+const lightboxCopy    = document.getElementById('lightboxCopy');
+
+function openLightbox(url) {
+  lightboxImg.src = url;
+  lightbox.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  lightboxClose.focus();
+}
+function closeLightbox() {
+  lightbox.classList.remove('open');
+  lightboxImg.src = '';
+  document.body.style.overflow = '';
+}
+
+lightboxClose.addEventListener('click', closeLightbox);
+lightboxBackdrop.addEventListener('click', closeLightbox);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox(); });
+
+lightboxDownload.addEventListener('click', () => {
+  const src = lightboxImg.src;
+  if (!src) return;
+  const a = document.createElement('a');
+  a.href = src; a.download = 'ai-image-' + Date.now() + '.jpg'; a.target = '_blank'; a.click();
+  showToast('已在新窗口打开，右键另存为', 'success');
 });
-function addToHistory(url) {
-  imgHistory.unshift(url);
-  if (imgHistory.length > 30) imgHistory = imgHistory.slice(0, 30);
-  localStorage.setItem('imgGenHistory', JSON.stringify(imgHistory));
-  renderImgHistory();
-}
-function renderImgHistory() {
-  imgHistoryCount.textContent = imgHistory.length > 0 ? imgHistory.length + ' 张' : '';
-  if (imgHistory.length === 0) { imgHistoryList.innerHTML = '<div class="history-empty">暂无历史记录</div>'; return; }
-  imgHistoryList.innerHTML = imgHistory.map(u => '<div class="history-item" data-url="' + escapeHtml(u) + '"><img src="' + escapeHtml(u) + '" alt="h" loading="lazy"/><div class="history-overlay">👁</div></div>').join('');
-}
+lightboxCopy.addEventListener('click', () => {
+  navigator.clipboard.writeText(lightboxImg.src).then(() => showToast('链接已复制', 'success')).catch(() => showToast('复制失败'));
+});
+
+// Main image click → open lightbox
+imageDisplay.addEventListener('click', e => {
+  const img = imageDisplay.querySelector('img[src]');
+  if (!img || e.target === img) openLightbox(img.src);
+});
+
+// History item double-click → open lightbox (single click = restore image)
+let lastClickTarget = null;
+let lastClickTime = 0;
 imgHistoryList.addEventListener('click', e => {
   const it = e.target.closest('.history-item');
   if (!it) return;
-  renderImage(it.dataset.url, true);
+  const now = Date.now();
+  if (lastClickTarget === it && now - lastClickTime < 350) {
+    // Double-click → lightbox
+    openLightbox(it.dataset.url);
+  } else {
+    // Single-click → restore image
+    renderImage(it.dataset.url, true);
+  }
+  lastClickTarget = it;
+  lastClickTime = now;
 });
-renderImgHistory();
 
-// =====================
+// Delete current image
+btnDelete.addEventListener('click', () => {
+  imageDisplay.innerHTML =
+    '<div class="placeholder-icon">🎨</div>' +
+    '<div class="placeholder-text">输入提示词开始生成<br/><small>生成的图片将显示在这里</small></div>';
+  imageDisplay.classList.remove('has-image');
+  imageActions.classList.remove('visible');
+  currentImageUrl = null;
+  imgGenTime.textContent = '';
+});
+
+// ============================================================
 // TTS
-// =====================
-const ttsText = document.getElementById('ttsText');
-const ttsCharCount = document.getElementById('ttsCharCount');
-const voiceGrid = document.getElementById('voiceGrid');
-const ttsSpeed = document.getElementById('ttsSpeed');
-const ttsSpeedVal = document.getElementById('ttsSpeedVal');
-const btnSynthesize = document.getElementById('btnSynthesize');
-const ttsPlayer = document.getElementById('ttsPlayer');
-const ttsPlaceholder = document.getElementById('ttsPlaceholder');
-const ttsAudio = document.getElementById('ttsAudio');
-const ttsTextPreview = document.getElementById('ttsTextPreview');
-const btnDownloadAudio = document.getElementById('btnDownloadAudio');
-const btnCopyAudioUrl = document.getElementById('btnCopyAudioUrl');
-const btnClearAudio = document.getElementById('btnClearAudio');
-const ttsWaveform = document.getElementById('ttsWaveform');
+// ============================================================
+const ttsText           = document.getElementById('ttsText');
+const ttsCharCount      = document.getElementById('ttsCharCount');
+const voiceGrid         = document.getElementById('voiceGrid');
+const ttsSpeed          = document.getElementById('ttsSpeed');
+const ttsSpeedVal       = document.getElementById('ttsSpeedVal');
+const btnSynthesize     = document.getElementById('btnSynthesize');
+const ttsPlayer         = document.getElementById('ttsPlayer');
+const ttsPlaceholder    = document.getElementById('ttsPlaceholder');
+const ttsAudio          = document.getElementById('ttsAudio');
+const ttsTextPreview    = document.getElementById('ttsTextPreview');
+const btnDownloadAudio  = document.getElementById('btnDownloadAudio');
+const btnCopyAudioUrl   = document.getElementById('btnCopyAudioUrl');
+const btnClearAudio     = document.getElementById('btnClearAudio');
+const ttsWaveform       = document.getElementById('ttsWaveform');
 let currentAudioUrl = null;
-let selectedVoice = 'male-qn-qingse';
+let selectedVoice  = 'male-qn-qingse';
+let isSynthesizing = false;
 
 // Build waveform bars
 (function buildWaveform() {
   for (let i = 0; i < 48; i++) {
     const bar = document.createElement('div');
     bar.className = 'wave-bar';
-    bar.style.height = Math.random() * 20 + 6 + 'px';
+    bar.style.height = (Math.random() * 20 + 6) + 'px';
     ttsWaveform.appendChild(bar);
   }
 })();
 
-ttsText.addEventListener('input', () => { ttsCharCount.textContent = ttsText.value.length + ' / 5000'; });
-ttsSpeed.addEventListener('input', () => { ttsSpeedVal.textContent = parseFloat(ttsSpeed.value).toFixed(1) + 'x'; });
+ttsText.addEventListener('input', () => {
+  const len = ttsText.value.length;
+  ttsCharCount.textContent = len + ' / 5000';
+  ttsCharCount.style.color = len > 3000 ? 'var(--warning)' : '';
+});
+ttsSpeed.addEventListener('input', () => {
+  ttsSpeedVal.textContent = parseFloat(ttsSpeed.value).toFixed(1) + 'x';
+});
+
 voiceGrid.addEventListener('click', e => {
   const b = e.target.closest('.voice-btn');
   if (!b) return;
   document.querySelectorAll('.voice-btn').forEach(x => x.classList.remove('active'));
-  b.classList.add('active'); selectedVoice = b.dataset.voice;
+  b.classList.add('active');
+  selectedVoice = b.dataset.voice;
 });
-async function synthesize() {
+
+// TTS debounced synthesize
+const debouncedSynthesize = debounce(function() {
+  if (isSynthesizing) return;
   const text = ttsText.value.trim();
-  if (!text) { showToast('请输入文本内容'); ttsText.focus(); return; }
-  if (text.length > 3000) { showToast('文本不能超过3000字'); return; }
-  btnSynthesize.disabled = true; btnSynthesize.textContent = '⏳ 合成中...';
-  try {
-    const data = await apiCall(API_BASE_TTS, {
-      model: 'speech-2.8-hd', text,
-      voice_setting: { voice_id: selectedVoice, speed: Math.min(2.0, Math.max(0.5, parseFloat(ttsSpeed.value) || 1.0)) },
-      output_format: 'url',
-    });
+  if (!text) { showToast('请输入文本内容', 'warning'); ttsText.focus(); return; }
+  if (text.length > 3000) { showToast('文本不能超过 3000 字', 'warning'); return; }
+
+  isSynthesizing = true;
+  btnSynthesize.disabled = true;
+  btnSynthesize.innerHTML = '<span class="btn-spinner"></span> 合成中...';
+  btnSynthesize.classList.add('loading');
+
+  apiCall('/api/tts', {
+    model: 'speech-2.8-hd',
+    text,
+    voice_setting: {
+      voice_id: selectedVoice,
+      speed: Math.min(2.0, Math.max(0.5, parseFloat(ttsSpeed.value) || 1.0)),
+    },
+    output_format: 'url',
+  }).then(data => {
     const url = data.audio_url;
-    if (!url) throw new Error('No audio URL returned');
+    if (!url) throw new Error('未返回音频地址');
     currentAudioUrl = url;
     ttsTextPreview.textContent = text;
     ttsAudio.src = url;
     ttsPlaceholder.style.display = 'none';
     ttsPlayer.style.display = 'flex';
     showToast('语音合成成功', 'success');
-  } catch(err) {
+  }).catch(err => {
     showToast(err.message || '合成失败');
-  } finally {
-    btnSynthesize.disabled = false; btnSynthesize.textContent = '✦ 开始合成语音';
-  }
-}
-btnSynthesize.addEventListener('click', synthesize);
-ttsText.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter') synthesize(); });
+  }).finally(() => {
+    isSynthesizing = false;
+    btnSynthesize.disabled = false;
+    btnSynthesize.innerHTML = '✦ 开始合成语音';
+    btnSynthesize.classList.remove('loading');
+  });
+}, 300);
+
+btnSynthesize.addEventListener('click', debouncedSynthesize);
+ttsText.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); debouncedSynthesize(); } });
+
 btnDownloadAudio.addEventListener('click', async () => {
   if (!currentAudioUrl) return;
   try {
     const r = await fetch(currentAudioUrl);
     const b = await r.blob();
     const u = URL.createObjectURL(b);
-    const a = document.createElement('a'); a.href = u; a.download = 'ai-voice-' + Date.now() + '.mp3'; a.click();
-    URL.revokeObjectURL(u); showToast('下载成功', 'success');
+    const a = document.createElement('a');
+    a.href = u; a.download = 'ai-voice-' + Date.now() + '.mp3'; a.click();
+    URL.revokeObjectURL(u);
+    showToast('下载成功', 'success');
   } catch { showToast('下载失败'); }
 });
+
 btnCopyAudioUrl.addEventListener('click', () => {
   if (!currentAudioUrl) return;
-  navigator.clipboard.writeText(currentAudioUrl).then(() => showToast('链接已复制', 'success')).catch(() => showToast('复制失败'));
-});
-btnClearAudio.addEventListener('click', () => {
-  ttsAudio.src = ''; currentAudioUrl = null; ttsPlayer.style.display = 'none'; ttsPlaceholder.style.display = 'flex';
+  navigator.clipboard.writeText(currentAudioUrl)
+    .then(() => showToast('链接已复制', 'success'))
+    .catch(() => showToast('复制失败'));
 });
 
-// =====================
+btnClearAudio.addEventListener('click', () => {
+  ttsAudio.src = '';
+  currentAudioUrl = null;
+  ttsPlayer.style.display = 'none';
+  ttsPlaceholder.style.display = 'flex';
+});
+
+// ============================================================
 // Gallery
-// =====================
-const gallerySearch = document.getElementById('gallerySearch');
+// ============================================================
+const gallerySearch     = document.getElementById('gallerySearch');
 const galleryCatFilters = document.getElementById('galleryCatFilters');
-const galleryGrid = document.getElementById('galleryGrid');
-const galleryCount = document.getElementById('galleryCount');
-const galleryModal = document.getElementById('galleryModal');
-const modalTitle = document.getElementById('modalTitle');
-const modalMeta = document.getElementById('modalMeta');
-const modalPrompt = document.getElementById('modalPrompt');
-const modalClose = document.getElementById('modalClose');
-const modalUseCn = document.getElementById('modalUseCn');
-const modalUseEn = document.getElementById('modalUseEn');
+const galleryGrid       = document.getElementById('galleryGrid');
+const galleryCount      = document.getElementById('galleryCount');
+const galleryModal      = document.getElementById('galleryModal');
+const modalTitle        = document.getElementById('modalTitle');
+const modalMeta         = document.getElementById('modalMeta');
+const modalPrompt       = document.getElementById('modalPrompt');
+const modalClose        = document.getElementById('modalClose');
+const modalUseCn        = document.getElementById('modalUseCn');
+const modalUseEn        = document.getElementById('modalUseEn');
+
 let allPrompts = [], activeCategory = 'all', searchQuery = '', currentModalPrompt = '', currentPromptId = null;
+
 const catLabels = { portrait:'📸肖像', fashion:'👗时尚', product:'📦产品', '3d':'🎨3D渲染', fantasy:'🐉奇幻', anime:'🎭动漫', landscape:'🏔️风景', logo:'🏷️Logo', cyberpunk:'🌃赛博朋克', vintage:'📻复古', painting:'🖼️绘画', steampunk:'⚙️蒸汽朋克', minimalist:'⬜极简', food:'🍜美食', character:'👤人物', comics:'📚漫画', chinese:'🇨🇳中式', other:'📎其他' };
-const catColors = { portrait:'#ec4899',fashion:'#f43f5e',product:'#8b5cf6','3d':'#06b6d4',fantasy:'#f59e0b',anime:'#ec4899',landscape:'#22c55e',logo:'#3b82f6',cyberpunk:'#8b5cf6',vintage:'#78716c',painting:'#e879f9',steampunk:'#d97706',minimalist:'#94a3b8',food:'#f97316',character:'#f43f5e',comics:'#6366f1',chinese:'#ef4444',other:'#64748b' };
+const catColors = { portrait:'#ec4899', fashion:'#f43f5e', product:'#8b5cf6', '3d':'#06b6d4', fantasy:'#f59e0b', anime:'#ec4899', landscape:'#22c55e', logo:'#3b82f6', cyberpunk:'#8b5cf6', vintage:'#78716c', painting:'#e879f9', steampunk:'#d97706', minimalist:'#94a3b8', food:'#f97316', character:'#f43f5e', comics:'#6366f1', chinese:'#ef4444', other:'#64748b' };
+
+const debouncedGallerySearch = debounce(() => { searchQuery = gallerySearch.value; renderGallery(); }, 200);
 
 async function loadPrompts() {
   try {
@@ -817,8 +853,11 @@ async function loadPrompts() {
     allPrompts = d.prompts || [];
     renderCategoryFilters(d.categories || []);
     renderGallery();
-  } catch(e) { galleryGrid.innerHTML = '<div class="gallery-loading">加载失败，请刷新重试</div>'; }
+  } catch(e) {
+    galleryGrid.innerHTML = '<div class="gallery-loading">加载失败，请刷新重试</div>';
+  }
 }
+
 function renderCategoryFilters(cats) {
   const all = ['all', ...cats];
   galleryCatFilters.innerHTML = all.map(c =>
@@ -831,26 +870,39 @@ function renderCategoryFilters(cats) {
     renderGallery();
   }));
 }
+
 function filterPrompts() {
   return allPrompts.filter(p => {
-    const mc = activeCategory==='all' || p.categories.includes(activeCategory);
+    const mc = activeCategory === 'all' || p.categories.includes(activeCategory);
     const q = searchQuery.toLowerCase();
     const ms = !q || p.title.toLowerCase().includes(q) || p.prompt.toLowerCase().includes(q);
     return mc && ms;
   });
 }
+
 function renderGallery() {
   const f = filterPrompts();
   galleryCount.textContent = '共 ' + f.length + ' / ' + allPrompts.length + ' 个提示词';
   if (f.length === 0) { galleryGrid.innerHTML = '<div class="gallery-loading">没有找到匹配的提示词</div>'; return; }
   galleryGrid.innerHTML = f.map(p => {
-    const cats = p.categories.slice(0,3).map(c => '<span class="gallery-cat-tag" style="border-color:' + (catColors[c]||'#8b5cf6') + '40;background:' + (catColors[c]||'#8b5cf6') + '15;color:' + (catColors[c]||'#8b5cf6') + '">' + escapeHtml(catLabels[c]||c) + '</span>').join('');
-    const preview = escapeHtml(p.prompt.substring(0,150)) + (p.prompt.length>150?'...':'');
+    const cats = p.categories.slice(0,3).map(c =>
+      '<span class="gallery-cat-tag" style="border-color:' + (catColors[c]||'#8b5cf6') + '40;background:' + (catColors[c]||'#8b5cf6') + '15;color:' + (catColors[c]||'#8b5cf6') + '">' + escapeHtml(catLabels[c]||c) + '</span>'
+    ).join('');
+    const preview = escapeHtml(p.prompt.substring(0,150)) + (p.prompt.length > 150 ? '...' : '');
     const hasCn = p.promptCn && p.promptCn.length > 20;
     const hasEn = p.promptEn && p.promptEn.length > 20;
-    return '<div class="gallery-card" data-id="' + p.id + '"><div class="gallery-card-header"><div class="gallery-card-title">' + escapeHtml(p.title) + '</div><div class="gallery-card-id">#' + p.id + '</div></div><div class="gallery-card-cats">' + cats + '</div><div class="gallery-card-preview">' + preview + '</div><div class="gallery-card-use">' + (hasCn?'<button class="gallery-use-cn">📝中文</button>':'') + (hasEn?'<button class="gallery-use-en">🌐英文</button>':'<button class="gallery-use-btn">📝使用</button>') + '</div></div>';
+    return '<div class="gallery-card" data-id="' + p.id + '">' +
+      '<div class="gallery-card-header"><div class="gallery-card-title">' + escapeHtml(p.title) + '</div><div class="gallery-card-id">#' + p.id + '</div></div>' +
+      '<div class="gallery-card-cats">' + cats + '</div>' +
+      '<div class="gallery-card-preview">' + preview + '</div>' +
+      '<div class="gallery-card-use">' +
+        (hasCn ? '<button class="gallery-use-cn">📝中文</button>' : '') +
+        (hasEn ? '<button class="gallery-use-en">🌐英文</button>' : '<button class="gallery-use-btn">📝使用</button>') +
+      '</div>' +
+    '</div>';
   }).join('');
 }
+
 galleryGrid.addEventListener('click', e => {
   const card = e.target.closest('.gallery-card');
   if (!card) return;
@@ -858,47 +910,51 @@ galleryGrid.addEventListener('click', e => {
   const id = parseInt(card.dataset.id);
   const p = allPrompts.find(x => x.id === id);
   if (!p) return;
-  const promptToUse = btn?.classList.contains('gallery-use-en') ? (p.promptEn||p.prompt) : (p.promptCn||p.prompt);
+  const promptToUse = btn?.classList.contains('gallery-use-en') ? (p.promptEn || p.prompt) : (p.promptCn || p.prompt);
   if (btn?.classList.contains('gallery-use-cn') || btn?.classList.contains('gallery-use-en')) {
     activateTab('image');
     document.getElementById('imgPrompt').value = promptToUse;
-    document.getElementById('imgCharCount').textContent = promptToUse.length + ' / 2000';
+    document.getElementById('imgCharCount').textContent = promptToUse.length + ' / 1500';
     showToast('提示词已填入！', 'success');
   } else {
     currentPromptId = p.id; currentModalPrompt = promptToUse;
     modalTitle.textContent = p.title;
-    modalMeta.textContent = '#' + p.id + (p.source?' · 来源: '+p.source:'');
+    modalMeta.textContent = '#' + p.id + (p.source ? ' · 来源: ' + p.source : '');
     modalPrompt.textContent = promptToUse;
     modalUseCn.style.display = (p.promptCn && p.promptCn.length > 20) ? '' : 'none';
     modalUseEn.style.display = (p.promptEn && p.promptEn.length > 20) ? '' : 'none';
     galleryModal.classList.add('open');
   }
 });
-gallerySearch.addEventListener('input', () => { searchQuery = gallerySearch.value; renderGallery(); });
+
+gallerySearch.addEventListener('input', debouncedGallerySearch);
 modalClose.addEventListener('click', () => galleryModal.classList.remove('open'));
 galleryModal.addEventListener('click', e => { if (e.target === galleryModal) galleryModal.classList.remove('open'); });
+
 modalUseCn.addEventListener('click', () => {
   const p = allPrompts.find(x => x.id === currentPromptId);
   const t = p ? (p.promptCn || p.prompt) : currentModalPrompt;
   activateTab('image');
   galleryModal.classList.remove('open');
   document.getElementById('imgPrompt').value = t;
-  document.getElementById('imgCharCount').textContent = t.length + ' / 2000';
+  document.getElementById('imgCharCount').textContent = t.length + ' / 1500';
   showToast('中文提示词已填入！', 'success');
 });
+
 modalUseEn.addEventListener('click', () => {
   const p = allPrompts.find(x => x.id === currentPromptId);
   const t = p ? (p.promptEn || p.prompt) : currentModalPrompt;
   activateTab('image');
   galleryModal.classList.remove('open');
   document.getElementById('imgPrompt').value = t;
-  document.getElementById('imgCharCount').textContent = t.length + ' / 2000';
+  document.getElementById('imgCharCount').textContent = t.length + ' / 1500';
   showToast('英文提示词已填入！', 'success');
 });
+
+// Lazy-load gallery only when tab is first opened
 const galleryNavBtn = document.querySelector('.nav-item[data-tab="gallery"]');
 let galleryLoaded = false;
 galleryNavBtn.addEventListener('click', () => { if (!galleryLoaded) { galleryLoaded = true; loadPrompts(); } });
-loadPrompts();
 </script>
 </body>
 </html>

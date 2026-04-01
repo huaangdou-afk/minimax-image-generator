@@ -65,6 +65,11 @@ jobs:
         run: npm test
         continue-on-error: true
 
+      # ---- Security Audit ----
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
       # ---- Build ----
       - name: Install production dependencies
         run: npm install --production
@@ -178,8 +183,9 @@ jobs:
           echo "::warning::Deployment check timed out after ${MAX_WAIT}s. Please verify manually on Render Dashboard."
           exit 0
 
-      - name: Get Render service info
+      - name: Get Render service info and URL
         if: always()
+        id: service_info
         run: |
           INFO=$(curl -s \
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
@@ -198,5 +204,78 @@ jobs:
             });
           ")
 
+          SERVICE_URL=$(echo "$INFO" | node -e "
+            let input = '';
+            process.stdin.on('data', d => input += d);
+            process.stdin.on('end', () => {
+              try {
+                const j = JSON.parse(input);
+                console.log(j.serviceDetails?.customDomain
+                  || j.serviceDetails?.url
+                  || 'https://minimax-image-generator.onrender.com');
+              } catch(e) {
+                console.log('https://minimax-image-generator.onrender.com');
+              }
+            });
+          ")
+
           echo "Service: $SERVICE_NAME"
+          echo "service_url=$SERVICE_URL" >> $GITHUB_OUTPUT
           echo "Render Dashboard: https://dashboard.render.com/web/${{ env.RENDER_SERVICE_ID }}"
+
+      - name: Deployment health check
+        if: steps.service_info.outputs.service_url != ''
+        run: |
+          SERVICE_URL="${{ steps.service_info.outputs.service_url }}"
+          HEALTH_URL="${SERVICE_URL}/api/key-status"
+          echo "Health checking: $HEALTH_URL"
+
+          MAX_WAIT=60
+          INTERVAL=5
+          ELAPSED=0
+
+          while [ $ELAPSED -lt $MAX_WAIT ]; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || echo "000")
+            echo "[$(date +%T)] HTTP $HTTP_CODE"
+
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "Health check passed: service is responding correctly."
+              exit 0
+            fi
+
+            sleep $INTERVAL
+            ELAPSED=$((ELAPSED + INTERVAL))
+          done
+
+          echo "::warning::Health check timed out after ${MAX_WAIT}s. Verify manually: $HEALTH_URL"
+          exit 0
+
+      - name: Report deployment failure via commit status
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'failure',
+              target_url: 'https://dashboard.render.com/web/${{ env.RENDER_SERVICE_ID }}',
+              description: 'Deployment to Render failed. Check logs for details.',
+              context: 'render/deploy'
+            });
+
+      - name: Report deployment success via commit status
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'success',
+              target_url: '${{ steps.service_info.outputs.service_url }}',
+              description: 'Successfully deployed to Render.',
+              context: 'render/deploy'
+            });
