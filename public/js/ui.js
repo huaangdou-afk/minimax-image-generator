@@ -107,7 +107,7 @@ async function doGenerateImage() {
 }
 
 imgPrompt.addEventListener('input', () => {
-  imgCharCount.textContent = imgPrompt.value.length + ' / 2000';
+  imgCharCount.textContent = imgPrompt.value.length + ' / 1500';
 });
 
 presetTags.addEventListener('click', e => {
@@ -116,7 +116,7 @@ presetTags.addEventListener('click', e => {
   document.querySelectorAll('.preset-tag').forEach(x => x.classList.remove('active'));
   t.classList.add('active');
   imgPrompt.value = t.dataset.prompt;
-  imgCharCount.textContent = imgPrompt.value.length + ' / 2000';
+  imgCharCount.textContent = imgPrompt.value.length + ' / 1500';
   imgPrompt.focus();
 });
 
@@ -223,7 +223,7 @@ let selectedVoice = 'male-qn-qingse';
 })();
 
 ttsText.addEventListener('input', () => {
-  ttsCharCount.textContent = ttsText.value.length + ' / 5000';
+  ttsCharCount.textContent = ttsText.value.length + ' / 3000';
 });
 
 ttsSpeed.addEventListener('input', () => {
@@ -252,7 +252,13 @@ async function doSynthesize() {
     if (!url) throw new Error('No audio URL returned');
     currentAudioUrl = url;
     ttsTextPreview.textContent = text;
-    ttsAudio.src = url;
+
+    // Proxy through server to avoid Aliyun OSS 403
+    const proxyRes = await fetch('/api/tts/audio?url=' + encodeURIComponent(url));
+    if (!proxyRes.ok) throw new Error('音频加载失败');
+    const { dataUrl } = await proxyRes.json();
+    ttsAudio.src = dataUrl;
+
     ttsPlaceholder.style.display = 'none';
     ttsPlayer.style.display = 'flex';
     showToast('语音合成成功', 'success');
@@ -269,9 +275,20 @@ ttsText.addEventListener('keydown', e => {
   if (e.ctrlKey && e.key === 'Enter') doSynthesize();
 });
 
-btnDownloadAudio.addEventListener('click', () => {
+btnDownloadAudio.addEventListener('click', async () => {
   if (!currentAudioUrl) return;
-  downloadUrl(currentAudioUrl, 'ai-voice-' + Date.now() + '.mp3');
+  try {
+    const res = await fetch('/api/tts/audio?url=' + encodeURIComponent(currentAudioUrl));
+    if (!res.ok) throw new Error('下载失败');
+    const { dataUrl } = await res.json();
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'ai-voice-' + Date.now() + '.mp3';
+    a.click();
+    showToast('音频下载成功', 'success');
+  } catch {
+    showToast('下载失败，请稍后重试');
+  }
 });
 
 btnCopyAudioUrl.addEventListener('click', () => {
@@ -405,7 +422,7 @@ galleryGrid.addEventListener('click', e => {
   if (btn?.classList.contains('gallery-use-cn') || btn?.classList.contains('gallery-use-en')) {
     activateTab('image');
     document.getElementById('imgPrompt').value = promptToUse;
-    document.getElementById('imgCharCount').textContent = promptToUse.length + ' / 2000';
+    document.getElementById('imgCharCount').textContent = promptToUse.length + ' / 1500';
     showToast('提示词已填入！', 'success');
   } else {
     currentPromptId = p.id;
@@ -435,7 +452,7 @@ modalUseCn.addEventListener('click', () => {
   activateTab('image');
   galleryModal.classList.remove('open');
   document.getElementById('imgPrompt').value = t;
-  document.getElementById('imgCharCount').textContent = t.length + ' / 2000';
+  document.getElementById('imgCharCount').textContent = t.length + ' / 1500';
   showToast('中文提示词已填入！', 'success');
 });
 
@@ -445,7 +462,7 @@ modalUseEn.addEventListener('click', () => {
   activateTab('image');
   galleryModal.classList.remove('open');
   document.getElementById('imgPrompt').value = t;
-  document.getElementById('imgCharCount').textContent = t.length + ' / 2000';
+  document.getElementById('imgCharCount').textContent = t.length + ' / 1500';
   showToast('英文提示词已填入！', 'success');
 });
 

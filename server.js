@@ -274,6 +274,46 @@ app.get('/api/download-image', downloadLimiter, async (req, res) => {
 });
 
 // =====================
+// API: Download TTS Audio (proxy to avoid Aliyun OSS 403)
+// =====================
+app.get('/api/tts/audio', downloadLimiter, async (req, res) => {
+  const { url } = req.query;
+  if (!url) return res.status(400).json({ error: 'url is required' });
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    return res.status(400).json({ error: 'Invalid URL format' });
+  }
+  const allowedProtocols = ['http:', 'https:'];
+  if (!allowedProtocols.includes(parsedUrl.protocol)) {
+    return res.status(400).json({ error: 'Only HTTP/HTTPS URLs are allowed' });
+  }
+  const blockedHosts = ['localhost', '127.0.0.1', '0.0.0.0', '::1', '169.254.169.254'];
+  if (blockedHosts.includes(parsedUrl.hostname) || parsedUrl.hostname.startsWith('192.168.') || parsedUrl.hostname.startsWith('10.') || parsedUrl.hostname.startsWith('172.')) {
+    return res.status(400).json({ error: 'Access to internal/private networks is not allowed' });
+  }
+
+  try {
+    const response = await axios.get(url, {
+      responseType: 'arraybuffer',
+      timeout: 30000,
+      maxRedirects: 5,
+      headers: { 'Accept': 'audio/*' },
+    });
+    const contentType = response.headers['content-type'] || 'audio/mpeg';
+    if (!contentType.startsWith('audio/')) {
+      return res.status(400).json({ error: 'URL does not point to an audio file' });
+    }
+    res.json({ dataUrl: `data:${contentType};base64,${Buffer.from(response.data).toString('base64')}`, contentType });
+  } catch (error) {
+    console.error('[%s] Audio download error:', genTraceId(), error.message);
+    res.status(500).json({ error: 'Download failed' });
+  }
+});
+
+// =====================
 // API: Get Available Voices
 // =====================
 app.get('/api/tts/voices', async (req, res) => {

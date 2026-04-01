@@ -200,7 +200,7 @@
               <textarea id="ttsText" placeholder="输入要转换为语音的文本，例如：欢迎使用 MiniMax 语音合成功能。"></textarea>
               <div class="prompt-footer">
                 <span>输入文本内容</span>
-                <span id="ttsCharCount">0 / 5000</span>
+                <span id="ttsCharCount">0 / 3000</span>
               </div>
             </div>
           </div>
@@ -740,7 +740,7 @@ let isSynthesizing = false;
 
 ttsText.addEventListener('input', () => {
   const len = ttsText.value.length;
-  ttsCharCount.textContent = len + ' / 5000';
+  ttsCharCount.textContent = len + ' / 3000';
   ttsCharCount.style.color = len > 3000 ? 'var(--warning)' : '';
 });
 ttsSpeed.addEventListener('input', () => {
