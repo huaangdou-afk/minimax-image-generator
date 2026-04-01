@@ -307,16 +307,13 @@ imgPrompt.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter')
 
 btnDownload.addEventListener('click', async () => {
   if (!currentImageUrl) return;
-  try {
-    const r = await fetch('/api/download-image?url=' + encodeURIComponent(currentImageUrl));
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error);
-    const a = document.createElement('a');
-    a.href = d.dataUrl;
-    a.download = 'ai-image-' + Date.now() + '.jpg';
-    a.click();
-    showToast('下载成功', 'success');
-  } catch { showToast('下载失败'); }
+  // 图片链接直接右键保存，或复制链接下载
+  const a = document.createElement('a');
+  a.href = currentImageUrl;
+  a.download = 'ai-image-' + Date.now() + '.jpg';
+  a.target = '_blank';
+  a.click();
+  showToast('图片已在新窗口打开，右键另存为即可', 'success');
 });
 btnCopy.addEventListener('click', () => {
   if (!currentImageUrl) return;
