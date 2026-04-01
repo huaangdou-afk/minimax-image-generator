@@ -1,7 +1,7 @@
 services:
   - name: minimax-image-generator
     region: singapore
-    repo: https://github.com/WaHaiLong/minimax-image-generator
+    repo: https://github.com/huaangdou-afk/minimax-image-generator
     branch: master
     type: web
     runtime: node
