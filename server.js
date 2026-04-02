@@ -19,6 +19,16 @@ const MAX_IMAGE_DIM_MIN = 256;
 app.use(express.json());
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: {
+    directives: {
+      'script-src': ["'self'", "'unsafe-inline'"],
+      'style-src':  ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      'font-src':    ["'self'", 'https://fonts.gstatic.com'],
+      'img-src':     ["'self'", 'data:', 'https:', 'blob:'],
+      'connect-src': ["'self'"],
+      'frame-src':   ['none'],
+    },
+  },
 }));
 
 // Rate limiting
