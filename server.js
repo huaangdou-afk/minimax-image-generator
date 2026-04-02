@@ -25,6 +25,7 @@ app.use(helmet({
       'style-src':  ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       'font-src':    ["'self'", 'https://fonts.gstatic.com'],
       'img-src':     ["'self'", 'data:', 'https:', 'blob:'],
+      'media-src':   ["'self'", 'https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com', 'https://hailuo-image-algeng-data.oss-cn-wulanchabu.aliyuncs.com'],
       'connect-src': ["'self'"],
       'frame-src':   ["'none'"],
     },
