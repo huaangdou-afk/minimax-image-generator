@@ -11,6 +11,34 @@
 - 🔊 **语音合成** — 基于 MiniMax speech-2.8-hd 模型，3种音色可选
 - 📚 **提示词画廊** — 内置 1116 个精选提示词，支持分类筛选和搜索
 
+## 分支策略
+
+本项目采用简化版 Git Flow 工作流：
+
+| 分支 | 用途 | 保护策略 |
+|------|------|---------|
+| `master` | 生产环境代码，只有通过 PR 合并 | 必须通过 CI，禁止直接推送 |
+| `develop` | 开发基准分支，功能合并到这里 | PR 必须通过 CI |
+
+### 开发流程
+
+```
+1. 从 develop 新建功能分支：git checkout -b feat/xxx develop
+2. 在功能分支上开发、提交（pre-commit hook 会自动运行 ESLint + 测试）
+3. 推送到远程：git push origin feat/xxx
+4. 创建 Pull Request → 合并到 develop
+5. GitHub Actions CI 会自动验证，测试通过后合并
+6. 如需发布，从 develop 创建 PR 合并到 master，触发 Render 部署
+```
+
+### pre-commit hook
+
+本地提交前会自动运行以下检查，失败则阻止提交：
+- `npx eslint --ignore-path .gitignore .` — 代码风格检查
+- `npm test` — 单元测试
+
+> Windows 用户：确保使用 Git Bash 或 WSL，以支持 shell 脚本运行。
+
 ## 快速启动
 
 ### 1. 克隆项目

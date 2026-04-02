@@ -29,8 +29,7 @@ jobs:
         run: npm install
 
       - name: Run ESLint
-        run: npx eslint --ignore-path .gitignore . || true
-        continue-on-error: true
+        run: npx eslint --ignore-path .gitignore .
 
       - name: Check package.json completeness
         run: |
@@ -49,11 +48,9 @@ jobs:
       - name: Run tests
         if: steps.has_tests.outputs.exists == 'true'
         run: npm test
-        continue-on-error: true
 
       - name: Run npm audit
         run: npm audit --audit-level=high
-        continue-on-error: true
 
       - name: Install production dependencies
         run: npm install --production
