@@ -1466,6 +1466,39 @@ main.main {
   flex: 1;
 }
 
+/* ── Image Generation — Two-Column Layout ── */
+.gen-two-col {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--apple-space-5);
+  align-items: start;
+}
+
+.gen-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--apple-space-4);
+  position: sticky;
+  top: 0;
+  align-self: start;
+}
+
+.gen-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--apple-space-4);
+}
+
+/* Responsive: collapse to single column on tablet/mobile */
+@media (max-width: 860px) {
+  .gen-two-col {
+    grid-template-columns: 1fr;
+  }
+  .gen-col-left {
+    position: static;
+  }
+}
+
 /* 快速风格 - 2列网格 */
 .img-time{font-size:10px;color:#bbb;margin-left:auto}
 

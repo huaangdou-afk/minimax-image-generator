@@ -92,175 +92,190 @@
   ══════════════════════════════════════ -->
   <section class="apple-panel active" id="tab-image" role="tabpanel">
 
-    <!-- Preview -->
-    <div id="imageDisplay" class="apple-preview">
-      <div class="apple-preview-placeholder" id="imagePlaceholder">
-        <div class="apple-preview-placeholder-icon">🖼</div>
-        <div class="apple-preview-placeholder-text">输入提示词<br/>开始生成图片</div>
-      </div>
-    </div>
+    <!-- Two-column layout: left=input+button, right=presets+settings -->
+    <div class="gen-two-col">
 
-    <!-- Preview actions -->
-    <div class="apple-preview-actions apple-mb-4" id="imageActions" style="display:none;">
-      <button class="apple-btn apple-btn-secondary" id="btnDownload">⬇ 下载</button>
-      <button class="apple-btn apple-btn-secondary" id="btnCopy">📋 复制链接</button>
-      <button class="apple-btn-icon" id="btnDelete" title="删除">✕</button>
-    </div>
+      <!-- ══ LEFT: Preview + Prompt + Button ══ -->
+      <div class="gen-col-left">
 
-    <!-- Style Reference Upload (Phase 2 / Task 10) -->
-    <div id="styleReferenceSection">
-      <div class="apple-card-flat" id="styleUploadCard">
-        <div id="styleUploadZone" class="apple-upload-zone">
-          <div class="apple-upload-icon">📷</div>
-          <div class="apple-upload-title">上传参考图，获得相似风格</div>
-          <div class="apple-upload-hint">拖拽图片到这里，或点击上传 · 支持 JPG / PNG / WebP</div>
-          <input type="file" id="styleFileInput" accept="image/jpeg,image/png,image/webp" style="display:none;" />
+        <!-- Preview -->
+        <div id="imageDisplay" class="apple-preview">
+          <div class="apple-preview-placeholder" id="imagePlaceholder">
+            <div class="apple-preview-placeholder-icon">🖼</div>
+            <div class="apple-preview-placeholder-text">输入提示词<br/>开始生成图片</div>
+          </div>
         </div>
-        <!-- Analysis result (hidden until analysis completes) -->
-        <div id="styleResult" style="display:none;">
-          <div class="apple-upload-preview">
-            <img id="stylePreviewImg" class="apple-upload-preview-img" alt="参考图" />
-            <div class="apple-upload-preview-info">
-              <div class="apple-tags" id="styleTags"></div>
+
+        <!-- Preview actions -->
+        <div class="apple-preview-actions apple-mb-4" id="imageActions" style="display:none;">
+          <button class="apple-btn apple-btn-secondary" id="btnDownload">⬇ 下载</button>
+          <button class="apple-btn apple-btn-secondary" id="btnCopy">📋 复制链接</button>
+          <button class="apple-btn-icon" id="btnDelete" title="删除">✕</button>
+        </div>
+
+        <!-- Prompt Input -->
+        <div class="apple-mb-4">
+          <label for="imgPrompt" class="apple-section-title" style="font-size:17px;margin-bottom:8px;display:block;">提示词</label>
+          <textarea
+            id="imgPrompt"
+            class="apple-textarea"
+            placeholder="描述你想要什么样的图片，例如：一只可爱的橘猫在阳光下打盹，奇幻风格，超高画质"
+            aria-label="图片提示词"
+            maxlength="2000"
+          ></textarea>
+          <div class="apple-input-footer" id="imgCharCountWrap">
+            <span id="imgCharCount">0 / 1500</span>
+            <span style="margin-left:12px;">支持中文描述</span>
+          </div>
+        </div>
+
+        <!-- Generate Button — always visible at bottom of left column -->
+        <button class="apple-btn apple-btn-primary" id="btnGenerateImg">✦ 生成图片</button>
+
+      </div><!-- /.gen-col-left -->
+
+      <!-- ══ RIGHT: Style Presets + Settings + History ══ -->
+      <div class="gen-col-right">
+
+        <!-- Style Reference Upload -->
+        <div id="styleReferenceSection">
+          <div class="apple-card-flat" id="styleUploadCard">
+            <div id="styleUploadZone" class="apple-upload-zone">
+              <div class="apple-upload-icon">📷</div>
+              <div class="apple-upload-title">上传参考图，获得相似风格</div>
+              <div class="apple-upload-hint">拖拽图片到这里，或点击上传 · 支持 JPG / PNG / WebP</div>
+              <input type="file" id="styleFileInput" accept="image/jpeg,image/png,image/webp" style="display:none;" />
             </div>
-            <button class="apple-upload-preview-remove" id="styleRemoveBtn">✕ 移除</button>
+            <!-- Analysis result -->
+            <div id="styleResult" style="display:none;">
+              <div class="apple-upload-preview">
+                <img id="stylePreviewImg" class="apple-upload-preview-img" alt="参考图" />
+                <div class="apple-upload-preview-info">
+                  <div class="apple-tags" id="styleTags"></div>
+                </div>
+                <button class="apple-upload-preview-remove" id="styleRemoveBtn">✕ 移除</button>
+              </div>
+              <div class="apple-flex apple-flex-between">
+                <button class="apple-btn apple-btn-primary" id="styleAppendBtn" style="width:auto;height:40px;font-size:13px;">＋ 填入 Prompt</button>
+                <button class="apple-btn apple-btn-ghost" id="styleReanalyzeBtn">🔄 重新分析</button>
+              </div>
+            </div>
+            <!-- Loading state -->
+            <div id="styleLoading" style="display:none;" class="apple-loading">
+              <div class="apple-spinner apple-spinner-dark"></div>
+              <div id="styleLoadingText">AI 正在分析图像风格...</div>
+              <div class="apple-progress"><div class="apple-progress-bar" id="styleProgressBar" style="width:60%"></div></div>
+            </div>
+            <!-- Error state -->
+            <div id="styleError" style="display:none;" class="apple-loading" style="color:var(--apple-red);">
+              <div>⚠ <span id="styleErrorText">分析失败，请重试</span></div>
+              <button class="apple-btn apple-btn-secondary" id="styleRetryBtn" style="height:36px;font-size:13px;margin-top:8px;">🔄 重新上传</button>
+            </div>
           </div>
-          <div class="apple-flex apple-flex-between">
-            <button class="apple-btn apple-btn-primary" id="styleAppendBtn" style="width:auto;height:40px;font-size:13px;">＋ 填入 Prompt</button>
-            <button class="apple-btn apple-btn-ghost" id="styleReanalyzeBtn">🔄 重新分析</button>
+        </div>
+
+        <!-- Style Carousel (Quick Presets) -->
+        <div class="apple-mb-4">
+          <div class="apple-section-title" style="font-size:17px;margin-bottom:12px;">快速风格</div>
+          <div class="style-grid" id="presetTags">
+            <div class="style-card active" data-prompt="Cinematic fantasy scene of a fierce female warrior falconer walking through a dark misty forest, wearing battle-worn leather armor infused with glowing ember textures. Her arm is raised, commanding a massive phoenix-eagle hybrid with blazing wings and flaming feathers. Ultra-detailed feathers, realistic fire physics, dramatic lighting, volumetric fog, epic fantasy atmosphere, hyper-realistic, 8k, cinematic color grading" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#d4536e"></div>
+              <div class="style-info"><p>女猎鹰者</p><span>暗黑奇幻</span></div>
+            </div>
+            <div class="style-card" data-prompt="Premium minimalist skincare product photography. A translucent pink liquid cleanser bottle with a white pump dispenser placed vertically at the center. The bottle rests inside an organic pool of soft pink foamy bubbles. Soft diffused top lighting, gentle rim light creates a luminous glow through the liquid. Sharp focus, high clarity, realistic liquid refraction, luxury beauty advertising style, ultra-realistic, 8K detail" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#a8c4e0"></div>
+              <div class="style-info"><p>高端护肤品</p><span>商业摄影</span></div>
+            </div>
+            <div class="style-card" data-prompt="Cinematic studio portrait of a woman seated at a dark stone table wearing a mocha satin shirt. In front of her is a ceramic bust sculpture of her own face, smooth matte finish. Soft cafe-inspired lighting, intimate and artistic mood, shallow depth of field, editorial realism, cozy cinematic tones" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#3a3a3a"></div>
+              <div class="style-info"><p>电影肖像</p><span>胶片质感</span></div>
+            </div>
+            <div class="style-card" data-prompt="A hyper-realistic top-down photograph of a 3D-printed diorama inside a beige cardboard box, with the lid being held open by two human hands. The interior reveals a miniature landscape featuring iconic landmarks, terrain, buildings, rivers, and crowds of tiny detailed human figures. Vibrant, toy-like style, matte 3D-printed textures, warm cinematic lighting, ultra-high resolution" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#6db87a"></div>
+              <div class="style-info"><p>微缩景观</p><span>移轴摄影</span></div>
+            </div>
+            <div class="style-card" data-prompt="A cave painting of a dragon, rendered with primitive ochres and charcoal lines on a rough stone wall. Smudged handprints, crude geometry, and flickering torchlight add a primal, ancient mood, prehistoric art style, mysterious atmosphere" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#c97b4a"></div>
+              <div class="style-info"><p>洞穴壁画</p><span>史前艺术</span></div>
+            </div>
+            <div class="style-card" data-prompt="Three different fantasy sailboats in the ocean, multiple scenes of beautiful aurora borealis and colorful moons with snowy mountains, a dreamy fantasy landscape, in the style of digital art, vibrant colors, cinematic composition, ultra detailed" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#7b9fd4"></div>
+              <div class="style-info"><p>极光帆船</p><span>梦幻奇幻</span></div>
+            </div>
+            <div class="style-card" data-prompt="A bold vector logo design in glitch art style, featuring distorted typography with RGB color channel shifts, fragmented lines, misaligned edges, digital noise effects, and a cyberpunk aesthetic. Neon or high-saturation color palette, sharp angular forms, dark background, hyper-realistic render" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#e040fb"></div>
+              <div class="style-info"><p>故障艺术</p><span>赛博朋克</span></div>
+            </div>
+            <div class="style-card" data-prompt="A 3D sculpted logo in steampunk style, made of aged brass and oxidized iron, with visible rivets, gears, and vintage mechanical elements, distressed and weathered surface, rich copper and bronze tones, Victorian-style filigree, retro-industrial design, soft spotlight lighting, hyper-realistic render" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#d97706"></div>
+              <div class="style-info"><p>蒸汽朋克</p><span>复古工业</span></div>
+            </div>
+            <div class="style-card" data-prompt="A flat branded paper folds itself into the full 3D shape of a sneaker, mid-motion. Dramatic studio lighting, origami texture detail, gradient shadows, Japanese minimalism feel, ultra-realistic 3D render, clean composition" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#f5f5f5"></div>
+              <div class="style-info"><p>折纸球鞋</p><span>极简3D</span></div>
+            </div>
+            <div class="style-card" data-prompt="A surreal oil painting of a dream landscape, executed in the style of early 20th-century dreamscapes. Melting shapes, floating forms, and swirling brushstrokes create a dreamlike dissonance, classic oil painting technique, haunting atmosphere, ultra detailed" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#c084fc"></div>
+              <div class="style-info"><p>超现实油画</p><span>梦境艺术</span></div>
+            </div>
+            <div class="style-card" data-prompt="A realistic vintage item being gently lifted from a dusty stack of old books in a dimly lit attic. Warm nostalgic lighting, soft shadows and golden highlights filtering through attic beams, partially opened revealing a miniature warmly lit interior. Moody and nostalgic atmosphere, ultra-realistic photography, editorial quality" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#b45309"></div>
+              <div class="style-info"><p>阁楼怀旧</p><span>暖色复古</span></div>
+            </div>
+            <div class="style-card" data-prompt="A neon floral harmony illustration of a woman, with flowers and plants outlined in glowing neon hues, vibrant colors, serene yet electrifying botanical scene, fantasy illustration, ultra detailed, cinematic lighting" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#f472b6"></div>
+              <div class="style-info"><p>霓虹花卉</p><span>霓虹插画</span></div>
+            </div>
+            <div class="style-card" data-prompt="A highly detailed 3D chibi figurine diorama of a character, captured in a dynamic action scene, inside a thematic display case with glass dome. Background with atmospheric effects, dynamic pose, studio cinematic lighting, vibrant color palette, collectible viral-friendly aesthetic, ultra detailed" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#60a5fa"></div>
+              <div class="style-info"><p>Q版手办</p><span>3D手办</span></div>
+            </div>
+            <div class="style-card" data-prompt="A highly realistic 3D render of the letter A designed as a full-body fluffy monster. Dense soft realistic fur, subtle volume and shadow, bold clean solid vibrant tones like mint and coral, studio lighting on a simple pastel background, minimal high-quality character design" onclick="selectStyle(this)">
+              <div class="style-dot" style="background:#34d399"></div>
+              <div class="style-info"><p>字母怪兽</p><span>可爱3D</span></div>
+            </div>
           </div>
         </div>
-        <!-- Loading state -->
-        <div id="styleLoading" style="display:none;" class="apple-loading">
-          <div class="apple-spinner apple-spinner-dark"></div>
-          <div id="styleLoadingText">AI 正在分析图像风格...</div>
-          <div class="apple-progress"><div class="apple-progress-bar" id="styleProgressBar" style="width:60%"></div></div>
-        </div>
-        <!-- Error state -->
-        <div id="styleError" style="display:none;" class="apple-loading" style="color:var(--apple-red);">
-          <div>⚠ <span id="styleErrorText">分析失败，请重试</span></div>
-          <button class="apple-btn apple-btn-secondary" id="styleRetryBtn" style="height:36px;font-size:13px;margin-top:8px;">🔄 重新上传</button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Prompt Input -->
-    <div class="apple-mb-4">
-      <label for="imgPrompt" class="apple-section-title" style="font-size:17px;margin-bottom:8px;display:block;">提示词</label>
-      <textarea
-        id="imgPrompt"
-        class="apple-textarea"
-        placeholder="描述你想要什么样的图片，例如：一只可爱的橘猫在阳光下打盹，奇幻风格，超高画质"
-        aria-label="图片提示词"
-        maxlength="2000"
-      ></textarea>
-      <div class="apple-input-footer" id="imgCharCountWrap">
-        <span id="imgCharCount">0 / 1500</span>
-        <span style="margin-left:12px;">支持中文描述</span>
-      </div>
-    </div>
+        <!-- Settings -->
+        <div class="apple-card-flat apple-mb-4" style="padding:var(--apple-space-4);">
+          <div class="apple-flex apple-flex-between" style="margin-bottom:var(--apple-space-3);">
+            <span style="font-size:var(--apple-text-sm);font-weight:600;">生成设置</span>
+          </div>
+          <div style="display:flex;gap:var(--apple-space-3);flex-wrap:wrap;align-items:center;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <label for="imgSize" style="font-size:var(--apple-text-sm);color:var(--apple-text-secondary);">尺寸</label>
+              <select id="imgSize" class="apple-select">
+                <option value="1:1">1:1 (1024×1024)</option>
+                <option value="16:9">16:9 (1280×720)</option>
+                <option value="9:16">9:16 (720×1280)</option>
+                <option value="4:3">4:3 (1024×768)</option>
+                <option value="3:4">3:4 (768×1024)</option>
+              </select>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex:1;">
+              <label for="imgSeed" style="font-size:var(--apple-text-sm);color:var(--apple-text-secondary);">种子</label>
+              <input type="number" id="imgSeed" placeholder="留空随机" style="flex:1;padding:8px 12px;border:1px solid var(--apple-border-soft);border-radius:var(--apple-radius-md);font-size:13px;min-width:80px;" />
+              <button class="apple-btn-icon" id="btnRandomSeed" title="随机种子">🎲</button>
+            </div>
+          </div>
+        </div>
 
-    <!-- Style Carousel (Quick Presets) -->
-    <div class="apple-mb-4">
-      <div class="apple-section-title" style="font-size:17px;margin-bottom:12px;">快速风格</div>
-      <div class="style-grid" id="presetTags">
-        <div class="style-card active" data-prompt="Cinematic fantasy scene of a fierce female warrior falconer walking through a dark misty forest, wearing battle-worn leather armor infused with glowing ember textures. Her arm is raised, commanding a massive phoenix-eagle hybrid with blazing wings and flaming feathers. Ultra-detailed feathers, realistic fire physics, dramatic lighting, volumetric fog, epic fantasy atmosphere, hyper-realistic, 8k, cinematic color grading" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#d4536e"></div>
-          <div class="style-info"><p>女猎鹰者</p><span>暗黑奇幻</span></div>
+        <!-- History -->
+        <div id="imgHistorySection" class="apple-card-flat" style="padding:var(--apple-space-4);">
+          <div class="apple-flex apple-flex-between" style="margin-bottom:var(--apple-space-3);">
+            <span style="font-size:var(--apple-text-sm);font-weight:600;">最近生成</span>
+            <span id="imgHistoryCount" style="font-size:var(--apple-text-sm);color:var(--apple-text-secondary);"></span>
+          </div>
+          <div class="apple-history" id="imgHistoryList"><div style="font-size:13px;color:var(--apple-text-secondary);padding:4px 0;">暂无历史记录</div></div>
+          <div id="historyFooter" style="display:none;margin-top:var(--apple-space-2);">
+            <button class="apple-btn apple-btn-ghost" id="btnClearHistory">🗑 清空历史</button>
+          </div>
         </div>
-        <div class="style-card" data-prompt="Premium minimalist skincare product photography. A translucent pink liquid cleanser bottle with a white pump dispenser placed vertically at the center. The bottle rests inside an organic pool of soft pink foamy bubbles. Soft diffused top lighting, gentle rim light creates a luminous glow through the liquid. Sharp focus, high clarity, realistic liquid refraction, luxury beauty advertising style, ultra-realistic, 8K detail" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#a8c4e0"></div>
-          <div class="style-info"><p>高端护肤品</p><span>商业摄影</span></div>
-        </div>
-        <div class="style-card" data-prompt="Cinematic studio portrait of a woman seated at a dark stone table wearing a mocha satin shirt. In front of her is a ceramic bust sculpture of her own face, smooth matte finish. Soft cafe-inspired lighting, intimate and artistic mood, shallow depth of field, editorial realism, cozy cinematic tones" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#3a3a3a"></div>
-          <div class="style-info"><p>电影肖像</p><span>胶片质感</span></div>
-        </div>
-        <div class="style-card" data-prompt="A hyper-realistic top-down photograph of a 3D-printed diorama inside a beige cardboard box, with the lid being held open by two human hands. The interior reveals a miniature landscape featuring iconic landmarks, terrain, buildings, rivers, and crowds of tiny detailed human figures. Vibrant, toy-like style, matte 3D-printed textures, warm cinematic lighting, ultra-high resolution" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#6db87a"></div>
-          <div class="style-info"><p>微缩景观</p><span>移轴摄影</span></div>
-        </div>
-        <div class="style-card" data-prompt="A cave painting of a dragon, rendered with primitive ochres and charcoal lines on a rough stone wall. Smudged handprints, crude geometry, and flickering torchlight add a primal, ancient mood, prehistoric art style, mysterious atmosphere" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#c97b4a"></div>
-          <div class="style-info"><p>洞穴壁画</p><span>史前艺术</span></div>
-        </div>
-        <div class="style-card" data-prompt="Three different fantasy sailboats in the ocean, multiple scenes of beautiful aurora borealis and colorful moons with snowy mountains, a dreamy fantasy landscape, in the style of digital art, vibrant colors, cinematic composition, ultra detailed" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#7b9fd4"></div>
-          <div class="style-info"><p>极光帆船</p><span>梦幻奇幻</span></div>
-        </div>
-        <div class="style-card" data-prompt="A bold vector logo design in glitch art style, featuring distorted typography with RGB color channel shifts, fragmented lines, misaligned edges, digital noise effects, and a cyberpunk aesthetic. Neon or high-saturation color palette, sharp angular forms, dark background, hyper-realistic render" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#e040fb"></div>
-          <div class="style-info"><p>故障艺术</p><span>赛博朋克</span></div>
-        </div>
-        <div class="style-card" data-prompt="A 3D sculpted logo in steampunk style, made of aged brass and oxidized iron, with visible rivets, gears, and vintage mechanical elements, distressed and weathered surface, rich copper and bronze tones, Victorian-style filigree, retro-industrial design, soft spotlight lighting, hyper-realistic render" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#d97706"></div>
-          <div class="style-info"><p>蒸汽朋克</p><span>复古工业</span></div>
-        </div>
-        <div class="style-card" data-prompt="A flat branded paper folds itself into the full 3D shape of a sneaker, mid-motion. Dramatic studio lighting, origami texture detail, gradient shadows, Japanese minimalism feel, ultra-realistic 3D render, clean composition" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#f5f5f5"></div>
-          <div class="style-info"><p>折纸球鞋</p><span>极简3D</span></div>
-        </div>
-        <div class="style-card" data-prompt="A surreal oil painting of a dream landscape, executed in the style of early 20th-century dreamscapes. Melting shapes, floating forms, and swirling brushstrokes create a dreamlike dissonance, classic oil painting technique, haunting atmosphere, ultra detailed" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#c084fc"></div>
-          <div class="style-info"><p>超现实油画</p><span>梦境艺术</span></div>
-        </div>
-        <div class="style-card" data-prompt="A realistic vintage item being gently lifted from a dusty stack of old books in a dimly lit attic. Warm nostalgic lighting, soft shadows and golden highlights filtering through attic beams, partially opened revealing a miniature warmly lit interior. Moody and nostalgic atmosphere, ultra-realistic photography, editorial quality" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#b45309"></div>
-          <div class="style-info"><p>阁楼怀旧</p><span>暖色复古</span></div>
-        </div>
-        <div class="style-card" data-prompt="A neon floral harmony illustration of a woman, with flowers and plants outlined in glowing neon hues, vibrant colors, serene yet electrifying botanical scene, fantasy illustration, ultra detailed, cinematic lighting" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#f472b6"></div>
-          <div class="style-info"><p>霓虹花卉</p><span>霓虹插画</span></div>
-        </div>
-        <div class="style-card" data-prompt="A highly detailed 3D chibi figurine diorama of a character, captured in a dynamic action scene, inside a thematic display case with glass dome. Background with atmospheric effects, dynamic pose, studio cinematic lighting, vibrant color palette, collectible viral-friendly aesthetic, ultra detailed" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#60a5fa"></div>
-          <div class="style-info"><p>Q版手办</p><span>3D手办</span></div>
-        </div>
-        <div class="style-card" data-prompt="A highly realistic 3D render of the letter A designed as a full-body fluffy monster. Dense soft realistic fur, subtle volume and shadow, bold clean solid vibrant tones like mint and coral, studio lighting on a simple pastel background, minimal high-quality character design" onclick="selectStyle(this)">
-          <div class="style-dot" style="background:#34d399"></div>
-          <div class="style-info"><p>字母怪兽</p><span>可爱3D</span></div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Settings -->
-    <div class="apple-card-flat apple-mb-4" style="padding:var(--apple-space-4);">
-      <div class="apple-flex apple-flex-between" style="margin-bottom:var(--apple-space-3);">
-        <span style="font-size:var(--apple-text-sm);font-weight:600;">生成设置</span>
-      </div>
-      <div style="display:flex;gap:var(--apple-space-3);flex-wrap:wrap;align-items:center;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <label for="imgSize" style="font-size:var(--apple-text-sm);color:var(--apple-text-secondary);">尺寸</label>
-          <select id="imgSize" class="apple-select">
-            <option value="1:1">1:1 (1024×1024)</option>
-            <option value="16:9">16:9 (1280×720)</option>
-            <option value="9:16">9:16 (720×1280)</option>
-            <option value="4:3">4:3 (1024×768)</option>
-            <option value="3:4">3:4 (768×1024)</option>
-          </select>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex:1;">
-          <label for="imgSeed" style="font-size:var(--apple-text-sm);color:var(--apple-text-secondary);">种子</label>
-          <input type="number" id="imgSeed" placeholder="留空随机" style="flex:1;padding:8px 12px;border:1px solid var(--apple-border-soft);border-radius:var(--apple-radius-md);font-size:13px;min-width:80px;" />
-          <button class="apple-btn-icon" id="btnRandomSeed" title="随机种子">🎲</button>
-        </div>
-      </div>
-    </div>
+      </div><!-- /.gen-col-right -->
 
-    <!-- Generate Button -->
-    <button class="apple-btn apple-btn-primary apple-mb-4" id="btnGenerateImg">✦ 生成图片</button>
-
-    <!-- History -->
-    <div id="imgHistorySection" class="apple-card-flat" style="padding:var(--apple-space-4);">
-      <div class="apple-flex apple-flex-between" style="margin-bottom:var(--apple-space-3);">
-        <span style="font-size:var(--apple-text-sm);font-weight:600;">最近生成</span>
-        <span id="imgHistoryCount" style="font-size:var(--apple-text-sm);color:var(--apple-text-secondary);"></span>
-      </div>
-      <div class="apple-history" id="imgHistoryList"><div style="font-size:13px;color:var(--apple-text-secondary);padding:4px 0;">暂无历史记录</div></div>
-      <div id="historyFooter" style="display:none;margin-top:var(--apple-space-2);">
-        <button class="apple-btn apple-btn-ghost" id="btnClearHistory">🗑 清空历史</button>
-      </div>
-    </div>
+    </div><!-- /.gen-two-col -->
 
   </section>
 
