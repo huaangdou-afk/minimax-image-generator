@@ -394,7 +394,7 @@
         <button class="ftab" onclick="filterTab(this)">语音合成</button>
         <button class="ftab" onclick="filterTab(this)">已收藏</button>
       </div>
-      <div class="gallery-search-box">
+      <div class="search-box">
         <svg viewBox="0 0 13 13" fill="none" width="13" height="13"><circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.2"/><path d="M8.5 8.5l3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         <input type="text" id="gallerySearch" placeholder="搜索提示词..." />
       </div>
@@ -413,7 +413,7 @@
     </div>
 
     <!-- Stats Bar -->
-    <div class="gallery-stats-bar apple-mb-4">
+    <div class="gallery-stats apple-mb-4">
       <div class="stat-item"><span class="stat-num">128</span><span class="stat-label">张图片</span></div>
       <div class="stat-sep"></div>
       <div class="stat-item"><span class="stat-num">24</span><span class="stat-label">条语音</span></div>
@@ -430,12 +430,14 @@
     <div class="apple-gallery-count apple-mb-4" id="galleryCount">加载中...</div>
 
     <!-- Grid -->
-    <div class="gallery-grid gallery-grid-4col" id="galleryGrid">
+    <div class="gallery-grid-wrap">
+    <div class="gallery-grid gallery-grid2" id="galleryGrid">
       <div class="apple-loading">
         <div class="apple-spinner apple-spinner-dark"></div>
         <div>提示词加载中...</div>
       </div>
     </div>
+    </div><!-- /.gallery-grid-wrap -->
 
   </section>
 

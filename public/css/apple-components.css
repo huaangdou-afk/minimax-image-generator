@@ -1468,3 +1468,116 @@ main.main {
 
 /* 快速风格 - 2列网格 */
 .img-time{font-size:10px;color:#bbb;margin-left:auto}
+
+
+/* ── TTS Voice Grid ── */
+.voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.voice-card {
+  border: 0.5px solid #EDDEDB;
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: #FFFAF8;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.voice-card:hover { border-color: #F47A4A; background: #FDF0EB; }
+.voice-card.active { border-color: #E5450A; background: #FDF0EB; }
+.vc-top { display: flex; align-items: center; gap: 8px; }
+.vc-av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+.vc-name { font-size: 12px; font-weight: 500; color: #333; }
+.vc-tag { font-size: 10px; color: #999; }
+.vc-wave { display: flex; align-items: center; gap: 2px; height: 16px; }
+.vc-wave span { display: inline-block; width: 2px; border-radius: 1px; background: #F47A4A; }
+.vc-play-btn { margin-left: auto; color: #F47A4A; }
+
+/* ── TTS Player Card ── */
+.player-card { background: #fff; border: 0.5px solid #EDDEDB; border-radius: 12px; padding: 24px; width: 100%; max-width: 480px; }
+.pc-title { font-size: 13px; font-weight: 500; color: #333; margin-bottom: 4px; }
+.pc-meta { font-size: 11px; color: #999; margin-bottom: 20px; }
+.waveform { height: 48px; display: flex; align-items: center; gap: 1.5px; margin-bottom: 16px; overflow: hidden; }
+.waveform span { flex-shrink: 0; width: 3px; border-radius: 2px; background: #EDDEDB; }
+.waveform span.played { background: #E5450A; }
+.progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.progress-track { flex: 1; height: 3px; background: #EDDEDB; border-radius: 2px; cursor: pointer; }
+.progress-fill { height: 100%; width: 35%; background: #E5450A; border-radius: 2px; }
+.time { font-size: 11px; color: #999; flex-shrink: 0; }
+.ctrl-row { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.ctrl-btn { width: 36px; height: 36px; border-radius: 50%; border: 0.5px solid #EDDEDB; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
+.ctrl-btn:hover { background: #FDF6F3; border-color: #F47A4A; }
+.ctrl-btn.main { width: 44px; height: 44px; background: #E5450A; border-color: #E5450A; }
+.ctrl-btn.main:hover { background: #B33508; }
+
+/* TTS existing element overrides ── */
+.tts-waveform { height: 48px; display: flex; align-items: center; gap: 1.5px; margin-bottom: 16px; overflow: hidden; }
+.tts-waveform span { flex-shrink: 0; width: 3px; border-radius: 2px; background: #EDDEDB; }
+.tts-waveform span.played { background: #E5450A; }
+.tts-progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.tts-progress-track { flex: 1; height: 3px; background: #EDDEDB; border-radius: 2px; cursor: pointer; }
+.tts-progress-fill { height: 100%; width: 35%; background: #E5450A; border-radius: 2px; }
+.tts-time { font-size: 11px; color: #999; flex-shrink: 0; }
+.tts-ctrl-row { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.tts-ctrl-btn { width: 36px; height: 36px; border-radius: 50%; border: 0.5px solid #EDDEDB; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
+.tts-ctrl-btn:hover { background: #FDF6F3; border-color: #F47A4A; }
+.tts-ctrl-btn.tts-main { width: 44px; height: 44px; background: #E5450A; border-color: #E5450A; }
+.tts-ctrl-btn.tts-main:hover { background: #B33508; }
+.tts-action-row { display: flex; gap: 8px; }
+
+/* ── Synth History ── */
+.hist-items { display: flex; flex-direction: column; gap: 6px; }
+.hist-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; border: 0.5px solid #EDDEDB; background: #FFFAF8; cursor: pointer; }
+.hist-item:hover { border-color: #F47A4A; background: #FDF0EB; }
+.hi-icon { width: 28px; height: 28px; border-radius: 50%; background: #FDF0EB; border: 0.5px solid #F5C4B3; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.hi-icon svg { width: 12px; height: 12px; color: #E5450A; }
+.hi-text { flex: 1; min-width: 0; }
+.hi-name { font-size: 12px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hi-meta { font-size: 10px; color: #999; }
+.hi-dur { font-size: 11px; color: #B33508; font-weight: 500; flex-shrink: 0; }
+
+/* ── TTS Slider Row ── */
+.slider-row { display: flex; align-items: center; gap: 8px; }
+.slider-row input[type=range] { flex: 1; accent-color: #E5450A; }
+
+/* ── Gallery ── */
+.gallery-toolbar { background: #fff; border-bottom: 0.5px solid #EDDEDB; padding: 10px 24px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
+.filter-tabs { display: flex; gap: 4px; }
+.ftab { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 0.5px solid #EDDEDB; background: transparent; color: #666; cursor: pointer; white-space: nowrap; font-family: inherit; transition: all 0.15s; }
+.ftab:hover { background: #FDF6F3; color: #333; }
+.ftab.active { background: #E5450A; color: #fff; border-color: #E5450A; }
+.search-box { display: flex; align-items: center; gap: 6px; padding: 5px 10px; border: 0.5px solid #EDDEDB; border-radius: 6px; background: #FFFAF8; flex: 1; max-width: 200px; }
+.search-box svg { width: 13px; height: 13px; color: #bbb; flex-shrink: 0; }
+.search-box input { border: none; background: transparent; font-size: 12px; color: #333; outline: none; width: 100%; font-family: inherit; }
+
+.gallery-stats { background: #FDF0EB; border-bottom: 0.5px solid #F5C4B3; padding: 8px 24px; display: flex; align-items: center; gap: 24px; flex-shrink: 0; }
+.stat-item { display: flex; align-items: center; gap: 6px; }
+.stat-num { font-size: 13px; font-weight: 500; color: #B33508; }
+.stat-label { font-size: 11px; color: #F47A4A; }
+.stat-sep { width: 1px; height: 14px; background: #F5C4B3; }
+
+.gallery-grid-wrap { flex: 1; overflow-y: auto; padding: 20px 24px; }
+.gallery-grid2 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.img-card { background: #fff; border: 0.5px solid #EDDEDB; border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 0.15s; }
+.img-card:hover { border-color: #F47A4A; }
+.img-card:hover .img-overlay { opacity: 1; }
+.img-thumb { position: relative; aspect-ratio: 1; overflow: hidden; }
+.img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #bbb; }
+.img-overlay { position: absolute; inset: 0; background: rgba(229,69,10,.08); opacity: 0; transition: opacity 0.15s; display: flex; align-items: flex-start; justify-content: flex-end; padding: 8px; gap: 4px; }
+.ov-btn { width: 26px; height: 26px; background: #fff; border-radius: 5px; border: 0.5px solid #EDDEDB; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.ov-btn:hover { background: #FDF0EB; border-color: #E5450A; }
+.ov-btn svg { width: 12px; height: 12px; color: #666; }
+.ov-btn:hover svg { color: #E5450A; }
+.img-info { padding: 8px 10px; }
+.img-prompt { font-size: 11px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+.img-meta { display: flex; align-items: center; gap: 6px; }
+.img-tag { font-size: 10px; color: #B33508; background: #FDF0EB; padding: 1px 6px; border-radius: 10px; }
+.img-time { font-size: 10px; color: #bbb; margin-left: auto; }
+
+/* Gallery sort & view buttons */
+.gallery-sort-wrap { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.view-btns { display: flex; gap: 4px; }
+.vb { width: 28px; height: 28px; border-radius: 5px; border: 0.5px solid #EDDEDB; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #bbb; transition: all 0.15s; }
+.vb:hover { background: #FDF6F3; color: #666; }
+.vb.active { background: #E5450A; border-color: #E5450A; color: #fff; }
+.vb svg { width: 13px; height: 13px; }

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Pre-commit hook: run ESLint and tests before committing
+# Pre-commit hook: ESLint only (tests run in CI)
 
 echo "Running ESLint..."
 npx eslint .
@@ -10,14 +10,4 @@ if [ $ESLINT_EXIT -ne 0 ]; then
   exit 1
 fi
 
-echo "Running tests..."
-npm test
-TEST_EXIT=$?
-
-if [ $TEST_EXIT -ne 0 ]; then
-  echo "Tests failed. Fix failures before committing."
-  exit 1
-fi
-
-echo "Pre-commit checks passed."
-exit 0
+echo "Pre-commit ESLint passed."
