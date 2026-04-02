@@ -21,6 +21,7 @@
     "helmet": "^8.0.0"
   },
   "devDependencies": {
+    "@mcp-b/chrome-devtools-mcp": "^2.2.1",
     "@playwright/test": "^1.59.1",
     "eslint": "^9.39.4",
     "jest": "^29.7.0",
