@@ -15,26 +15,77 @@
 </head>
 <body>
 
-<!-- ══ Top Navigation ══ -->
-<header class="apple-nav">
-  <a class="apple-nav-logo" href="/">
-    <span class="apple-nav-logo-icon">✦</span>
-    <span>MiniMax AI</span>
-  </a>
-  <nav class="apple-nav-tabs" role="tablist">
-    <button class="apple-nav-tab active" data-tab="image" role="tab" aria-selected="true">图片生成</button>
-    <button class="apple-nav-tab" data-tab="tts" role="tab" aria-selected="false">语音合成</button>
-    <button class="apple-nav-tab" data-tab="gallery" role="tab" aria-selected="false">画廊</button>
-  </nav>
-  <div class="apple-nav-status">
-    <span class="apple-nav-status-dot"></span>
-    <span>API 已连接</span>
-  </div>
-</header>
+<!-- ══ App Shell with Sidebar ══ -->
+<div class="app">
 
-<!-- ══ App Shell ══ -->
-<div class="apple-layout">
-<div class="apple-content">
+  <!-- ══ Sidebar ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 16 16" fill="none" width="16" height="16">
+          <rect x="2" y="2" width="5" height="5" rx="1" fill="#fff" opacity=".9"/>
+          <rect x="9" y="2" width="5" height="5" rx="1" fill="#fff" opacity=".6"/>
+          <rect x="2" y="9" width="5" height="5" rx="1" fill="#fff" opacity=".6"/>
+          <rect x="9" y="9" width="5" height="5" rx="1" fill="#fff" opacity=".3"/>
+        </svg>
+      </div>
+      <div class="logo-text">MiniMax AI</div>
+      <div class="logo-badge">Pro</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">创作工具</div>
+      <div class="nav-item active" id="navImage" onclick="switchSection('image')">
+        <svg viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 8l3.5-3 3 2.5 2.5-3 4 4" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        图片生成
+      </div>
+      <div class="nav-item" id="navTts" onclick="switchSection('tts')">
+        <svg viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 5.5c0-1.1.9-2 2-2s2 .9 2 2v3a2 2 0 01-4 0V5.5z" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 8.5a4 4 0 008 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        语音合成
+      </div>
+      <div class="nav-item" id="navGallery" onclick="switchSection('gallery')">
+        <svg viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="8" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="8" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+        画廊
+      </div>
+      <div class="nav-section-label" style="margin-top:12px">管理</div>
+      <div class="nav-item">
+        <svg viewBox="0 0 15 15" fill="none"><path d="M7.5 1L9.5 5.5H14L10.5 8.5L12 13L7.5 10L3 13L4.5 8.5L1 5.5H5.5L7.5 1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        使用统计
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 15 15" fill="none"><path d="M2 3h11M2 7.5h11M2 12h11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        API 管理
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="avatar">黄</div>
+        <div>
+          <div class="user-name">黄豆AI</div>
+          <div class="user-plan">企业版 · 剩余 8,420 次</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ Main Content ══ -->
+  <div class="main-content">
+  <main class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="topbarTitle">图片生成</span>
+      <div class="topbar-sep"></div>
+      <span class="topbar-sub" id="topbarSub">基于 MiniMax Image 01 模型</span>
+      <div class="topbar-actions">
+        <div class="api-status"><div class="dot-green"></div><span>API 正常</span></div>
+        <button class="btn-sm btn-primary">导出记录</button>
+      </div>
+    </div>
+    <div class="quota-bar">
+      <span>本月用量</span>
+      <div class="quota-track"><div class="quota-fill"></div></div>
+      <span>6,800 / 10,000 次</span>
+      <span class="quota-upgrade">升级套餐 →</span>
+    </div>
+    <div class="content-body">
 
   <!-- ══════════════════════════════════════
        TAB: 图片生成
@@ -112,48 +163,62 @@
     <!-- Style Carousel (Quick Presets) -->
     <div class="apple-mb-4">
       <div class="apple-section-title" style="font-size:17px;margin-bottom:12px;">快速风格</div>
-      <div class="apple-carousel" id="presetTags">
-        <div class="apple-carousel-card" data-prompt="Cinematic fantasy scene of a fierce female warrior falconer walking through a dark misty forest, wearing battle-worn leather armor infused with glowing ember textures. Her arm is raised, commanding a massive phoenix-eagle hybrid with blazing wings and flaming feathers. Ultra-detailed feathers, realistic fire physics, dramatic lighting, volumetric fog, epic fantasy atmosphere, hyper-realistic, 8k, cinematic color grading">
-          🔥<br/><span class="apple-carousel-label">女猎鹰者</span><br/><span class="apple-carousel-hint">点击使用</span>
+      <div class="style-grid" id="presetTags">
+        <div class="style-card active" data-prompt="Cinematic fantasy scene of a fierce female warrior falconer walking through a dark misty forest, wearing battle-worn leather armor infused with glowing ember textures. Her arm is raised, commanding a massive phoenix-eagle hybrid with blazing wings and flaming feathers. Ultra-detailed feathers, realistic fire physics, dramatic lighting, volumetric fog, epic fantasy atmosphere, hyper-realistic, 8k, cinematic color grading" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#d4536e"></div>
+          <div class="style-info"><p>女猎鹰者</p><span>暗黑奇幻</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="Premium minimalist skincare product photography. A translucent pink liquid cleanser bottle with a white pump dispenser placed vertically at the center. The bottle rests inside an organic pool of soft pink foamy bubbles. Soft diffused top lighting, gentle rim light creates a luminous glow through the liquid. Sharp focus, high clarity, realistic liquid refraction, luxury beauty advertising style, ultra-realistic, 8K detail">
-          🧴<br/><span class="apple-carousel-label">高端护肤品</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="Premium minimalist skincare product photography. A translucent pink liquid cleanser bottle with a white pump dispenser placed vertically at the center. The bottle rests inside an organic pool of soft pink foamy bubbles. Soft diffused top lighting, gentle rim light creates a luminous glow through the liquid. Sharp focus, high clarity, realistic liquid refraction, luxury beauty advertising style, ultra-realistic, 8K detail" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#a8c4e0"></div>
+          <div class="style-info"><p>高端护肤品</p><span>商业摄影</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="Cinematic studio portrait of a woman seated at a dark stone table wearing a mocha satin shirt. In front of her is a ceramic bust sculpture of her own face, smooth matte finish. Soft cafe-inspired lighting, intimate and artistic mood, shallow depth of field, editorial realism, cozy cinematic tones">
-          🎬<br/><span class="apple-carousel-label">电影肖像</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="Cinematic studio portrait of a woman seated at a dark stone table wearing a mocha satin shirt. In front of her is a ceramic bust sculpture of her own face, smooth matte finish. Soft cafe-inspired lighting, intimate and artistic mood, shallow depth of field, editorial realism, cozy cinematic tones" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#3a3a3a"></div>
+          <div class="style-info"><p>电影肖像</p><span>胶片质感</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="A hyper-realistic top-down photograph of a 3D-printed diorama inside a beige cardboard box, with the lid being held open by two human hands. The interior reveals a miniature landscape featuring iconic landmarks, terrain, buildings, rivers, and crowds of tiny detailed human figures. Vibrant, toy-like style, matte 3D-printed textures, warm cinematic lighting, ultra-high resolution">
-          📦<br/><span class="apple-carousel-label">微缩景观</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="A hyper-realistic top-down photograph of a 3D-printed diorama inside a beige cardboard box, with the lid being held open by two human hands. The interior reveals a miniature landscape featuring iconic landmarks, terrain, buildings, rivers, and crowds of tiny detailed human figures. Vibrant, toy-like style, matte 3D-printed textures, warm cinematic lighting, ultra-high resolution" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#6db87a"></div>
+          <div class="style-info"><p>微缩景观</p><span>移轴摄影</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="A cave painting of a dragon, rendered with primitive ochres and charcoal lines on a rough stone wall. Smudged handprints, crude geometry, and flickering torchlight add a primal, ancient mood, prehistoric art style, mysterious atmosphere">
-          🏛<br/><span class="apple-carousel-label">洞穴壁画</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="A cave painting of a dragon, rendered with primitive ochres and charcoal lines on a rough stone wall. Smudged handprints, crude geometry, and flickering torchlight add a primal, ancient mood, prehistoric art style, mysterious atmosphere" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#c97b4a"></div>
+          <div class="style-info"><p>洞穴壁画</p><span>史前艺术</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="Three different fantasy sailboats in the ocean, multiple scenes of beautiful aurora borealis and colorful moons with snowy mountains, a dreamy fantasy landscape, in the style of digital art, vibrant colors, cinematic composition, ultra detailed">
-          ⛵<br/><span class="apple-carousel-label">极光帆船</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="Three different fantasy sailboats in the ocean, multiple scenes of beautiful aurora borealis and colorful moons with snowy mountains, a dreamy fantasy landscape, in the style of digital art, vibrant colors, cinematic composition, ultra detailed" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#7b9fd4"></div>
+          <div class="style-info"><p>极光帆船</p><span>梦幻奇幻</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="A bold vector logo design in glitch art style, featuring distorted typography with RGB color channel shifts, fragmented lines, misaligned edges, digital noise effects, and a cyberpunk aesthetic. Neon or high-saturation color palette, sharp angular forms, dark background, hyper-realistic render">
-          🖼<br/><span class="apple-carousel-label">故障艺术</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="A bold vector logo design in glitch art style, featuring distorted typography with RGB color channel shifts, fragmented lines, misaligned edges, digital noise effects, and a cyberpunk aesthetic. Neon or high-saturation color palette, sharp angular forms, dark background, hyper-realistic render" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#e040fb"></div>
+          <div class="style-info"><p>故障艺术</p><span>赛博朋克</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="A 3D sculpted logo in steampunk style, made of aged brass and oxidized iron, with visible rivets, gears, and vintage mechanical elements, distressed and weathered surface, rich copper and bronze tones, Victorian-style filigree, retro-industrial design, soft spotlight lighting, hyper-realistic render">
-          ⚙<br/><span class="apple-carousel-label">蒸汽朋克</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="A 3D sculpted logo in steampunk style, made of aged brass and oxidized iron, with visible rivets, gears, and vintage mechanical elements, distressed and weathered surface, rich copper and bronze tones, Victorian-style filigree, retro-industrial design, soft spotlight lighting, hyper-realistic render" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#d97706"></div>
+          <div class="style-info"><p>蒸汽朋克</p><span>复古工业</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="A flat branded paper folds itself into the full 3D shape of a sneaker, mid-motion. Dramatic studio lighting, origami texture detail, gradient shadows, Japanese minimalism feel, ultra-realistic 3D render, clean composition">
-          👟<br/><span class="apple-carousel-label">折纸球鞋</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="A flat branded paper folds itself into the full 3D shape of a sneaker, mid-motion. Dramatic studio lighting, origami texture detail, gradient shadows, Japanese minimalism feel, ultra-realistic 3D render, clean composition" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#f5f5f5"></div>
+          <div class="style-info"><p>折纸球鞋</p><span>极简3D</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="A surreal oil painting of a dream landscape, executed in the style of early 20th-century dreamscapes. Melting shapes, floating forms, and swirling brushstrokes create a dreamlike dissonance, classic oil painting technique, haunting atmosphere, ultra detailed">
-          🎨<br/><span class="apple-carousel-label">超现实油画</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="A surreal oil painting of a dream landscape, executed in the style of early 20th-century dreamscapes. Melting shapes, floating forms, and swirling brushstrokes create a dreamlike dissonance, classic oil painting technique, haunting atmosphere, ultra detailed" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#c084fc"></div>
+          <div class="style-info"><p>超现实油画</p><span>梦境艺术</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="A realistic vintage item being gently lifted from a dusty stack of old books in a dimly lit attic. Warm nostalgic lighting, soft shadows and golden highlights filtering through attic beams, partially opened revealing a miniature warmly lit interior. Moody and nostalgic atmosphere, ultra-realistic photography, editorial quality">
-          📚<br/><span class="apple-carousel-label">阁楼怀旧</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="A realistic vintage item being gently lifted from a dusty stack of old books in a dimly lit attic. Warm nostalgic lighting, soft shadows and golden highlights filtering through attic beams, partially opened revealing a miniature warmly lit interior. Moody and nostalgic atmosphere, ultra-realistic photography, editorial quality" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#b45309"></div>
+          <div class="style-info"><p>阁楼怀旧</p><span>暖色复古</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="A neon floral harmony illustration of a woman, with flowers and plants outlined in glowing neon hues, vibrant colors, serene yet electrifying botanical scene, fantasy illustration, ultra detailed, cinematic lighting">
-          🌸<br/><span class="apple-carousel-label">霓虹花卉</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="A neon floral harmony illustration of a woman, with flowers and plants outlined in glowing neon hues, vibrant colors, serene yet electrifying botanical scene, fantasy illustration, ultra detailed, cinematic lighting" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#f472b6"></div>
+          <div class="style-info"><p>霓虹花卉</p><span>霓虹插画</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="A highly detailed 3D chibi figurine diorama of a character, captured in a dynamic action scene, inside a thematic display case with glass dome. Background with atmospheric effects, dynamic pose, studio cinematic lighting, vibrant color palette, collectible viral-friendly aesthetic, ultra detailed">
-          🎭<br/><span class="apple-carousel-label">Q版手办</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="A highly detailed 3D chibi figurine diorama of a character, captured in a dynamic action scene, inside a thematic display case with glass dome. Background with atmospheric effects, dynamic pose, studio cinematic lighting, vibrant color palette, collectible viral-friendly aesthetic, ultra detailed" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#60a5fa"></div>
+          <div class="style-info"><p>Q版手办</p><span>3D手办</span></div>
         </div>
-        <div class="apple-carousel-card" data-prompt="A highly realistic 3D render of the letter A designed as a full-body fluffy monster. Dense soft realistic fur, subtle volume and shadow, bold clean solid vibrant tones like mint and coral, studio lighting on a simple pastel background, minimal high-quality character design">
-          🔤<br/><span class="apple-carousel-label">字母怪兽</span><br/><span class="apple-carousel-hint">点击使用</span>
+        <div class="style-card" data-prompt="A highly realistic 3D render of the letter A designed as a full-body fluffy monster. Dense soft realistic fur, subtle volume and shadow, bold clean solid vibrant tones like mint and coral, studio lighting on a simple pastel background, minimal high-quality character design" onclick="selectStyle(this)">
+          <div class="style-dot" style="background:#34d399"></div>
+          <div class="style-info"><p>字母怪兽</p><span>可爱3D</span></div>
         </div>
       </div>
     </div>
@@ -211,10 +276,28 @@
         <div class="apple-preview-placeholder-text">输入文本<br/>开始合成语音</div>
       </div>
     </div>
-    <div id="ttsPlayer" class="apple-audio-player apple-mb-4" style="display:none;">
-      <audio id="ttsAudio" controls></audio>
+
+    <div id="ttsPlayer" class="player-card apple-mb-4" style="display:none;">
+      <div class="pc-title" id="ttsTextPreview"></div>
+      <div class="pc-meta" id="ttsMeta"></div>
+      <div class="tts-waveform" id="ttsWaveform"></div>
+      <div class="tts-progress-row">
+        <span class="tts-time" id="ttsTimeCurrent">0:00</span>
+        <div class="tts-progress-track" id="ttsProgressTrack">
+          <div class="tts-progress-fill" id="ttsProgressFill"></div>
+        </div>
+        <span class="tts-time" id="ttsTimeTotal">0:00</span>
+      </div>
+      <div class="tts-ctrl-row">
+        <div class="tts-ctrl-btn" id="ttsBtnPrev" title="上一首"><svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M3 4v8M13 4L7 8l6 4V4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+        <div class="tts-ctrl-btn tts-main" id="ttsBtnPlay" title="播放"><svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M5 3l8 5-8 5V3z" fill="currentColor"/></svg></div>
+        <div class="tts-ctrl-btn" id="ttsBtnNext" title="下一首"><svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M13 4v8M3 4l6 4-6 4V4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="tts-action-row">
+        <button class="apple-btn apple-btn-secondary" id="ttsBtnResynth" style="height:36px;font-size:12px;">🔄 重新合成</button>
+        <button class="apple-btn apple-btn-primary" id="ttsBtnDown" style="height:36px;font-size:12px;flex:1;">⬇ 下载音频</button>
+      </div>
     </div>
-    <div id="ttsTextPreview" style="display:none;font-size:13px;color:var(--apple-text-secondary);margin-bottom:8px;padding:0 4px;"></div>
 
     <!-- Text Input -->
     <div class="apple-mb-4">
@@ -233,18 +316,46 @@
     <!-- Voice Selection -->
     <div class="apple-mb-4">
       <div class="apple-section-title" style="font-size:17px;margin-bottom:12px;">音色选择</div>
-      <div class="apple-voice-grid" id="voiceGrid">
-        <div class="apple-voice-card active" data-voice="male-qn-qingse">
-          <div class="apple-voice-icon">🎤</div>
-          <div class="apple-voice-label">清澈少年</div>
+      <div class="voice-grid" id="voiceGrid">
+        <div class="voice-card active" data-voice="male-qn-qingse">
+          <div class="vc-top">
+            <div class="vc-av" style="background:#FDF0EB;color:#B33508">清</div>
+            <div><div class="vc-name">清澈少年</div><div class="vc-tag">活力 · 普通话</div></div>
+            <div class="vc-play-btn"><svg viewBox="0 0 8 8" fill="none" width="8" height="8"><path d="M2 1.5l4 2.5-4 2.5V1.5z" fill="currentColor"/></svg></div>
+          </div>
+          <div class="vc-wave">
+            <span style="height:4px"></span><span style="height:8px"></span><span style="height:12px"></span><span style="height:16px"></span><span style="height:10px"></span><span style="height:14px"></span><span style="height:6px"></span><span style="height:10px"></span><span style="height:8px"></span><span style="height:12px"></span><span style="height:4px"></span><span style="height:8px"></span>
+          </div>
         </div>
-        <div class="apple-voice-card" data-voice="female-tianmei">
-          <div class="apple-voice-icon">🎤</div>
-          <div class="apple-voice-label">甜美女声</div>
+        <div class="voice-card" data-voice="female-tianmei">
+          <div class="vc-top">
+            <div class="vc-av" style="background:#E6F1FB;color:#0C447C">甜</div>
+            <div><div class="vc-name">甜美女声</div><div class="vc-tag">温柔 · 普通话</div></div>
+            <div class="vc-play-btn"><svg viewBox="0 0 8 8" fill="none" width="8" height="8"><path d="M2 1.5l4 2.5-4 2.5V1.5z" fill="currentColor"/></svg></div>
+          </div>
+          <div class="vc-wave">
+            <span style="height:6px"></span><span style="height:14px"></span><span style="height:10px"></span><span style="height:8px"></span><span style="height:16px"></span><span style="height:6px"></span><span style="height:12px"></span><span style="height:10px"></span><span style="height:8px"></span><span style="height:14px"></span><span style="height:6px"></span><span style="height:10px"></span>
+          </div>
         </div>
-        <div class="apple-voice-card" data-voice="female-shaonv">
-          <div class="apple-voice-icon">🎤</div>
-          <div class="apple-voice-label">甜美少女</div>
+        <div class="voice-card" data-voice="female-shaonv">
+          <div class="vc-top">
+            <div class="vc-av" style="background:#EAF3DE;color:#27500A">少</div>
+            <div><div class="vc-name">甜美少女</div><div class="vc-tag">活泼 · 普通话</div></div>
+            <div class="vc-play-btn"><svg viewBox="0 0 8 8" fill="none" width="8" height="8"><path d="M2 1.5l4 2.5-4 2.5V1.5z" fill="currentColor"/></svg></div>
+          </div>
+          <div class="vc-wave">
+            <span style="height:8px"></span><span style="height:12px"></span><span style="height:16px"></span><span style="height:10px"></span><span style="height:14px"></span><span style="height:8px"></span><span style="height:12px"></span><span style="height:6px"></span><span style="height:14px"></span><span style="height:10px"></span><span style="height:8px"></span><span style="height:12px"></span>
+          </div>
+        </div>
+        <div class="voice-card" data-voice="male-zhuoyue">
+          <div class="vc-top">
+            <div class="vc-av" style="background:#FAEEDA;color:#633806">卓</div>
+            <div><div class="vc-name">卓越男声</div><div class="vc-tag">磁性 · 普通话</div></div>
+            <div class="vc-play-btn"><svg viewBox="0 0 8 8" fill="none" width="8" height="8"><path d="M2 1.5l4 2.5-4 2.5V1.5z" fill="currentColor"/></svg></div>
+          </div>
+          <div class="vc-wave">
+            <span style="height:10px"></span><span style="height:6px"></span><span style="height:14px"></span><span style="height:12px"></span><span style="height:8px"></span><span style="height:16px"></span><span style="height:10px"></span><span style="height:12px"></span><span style="height:6px"></span><span style="height:14px"></span><span style="height:8px"></span><span style="height:10px"></span>
+          </div>
         </div>
       </div>
     </div>
@@ -275,9 +386,41 @@
   ══════════════════════════════════════ -->
   <section class="apple-panel" id="tab-gallery" role="tabpanel">
 
-    <!-- Search -->
-    <div class="apple-gallery-toolbar apple-mb-4">
-      <input type="text" id="gallerySearch" class="apple-search" placeholder="🔍 搜索提示词关键词..." />
+    <!-- Gallery Toolbar -->
+    <div class="gallery-toolbar apple-mb-4">
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="filterTab(this)">全部</button>
+        <button class="ftab" onclick="filterTab(this)">图片生成</button>
+        <button class="ftab" onclick="filterTab(this)">语音合成</button>
+        <button class="ftab" onclick="filterTab(this)">已收藏</button>
+      </div>
+      <div class="gallery-search-box">
+        <svg viewBox="0 0 13 13" fill="none" width="13" height="13"><circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.2"/><path d="M8.5 8.5l3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <input type="text" id="gallerySearch" placeholder="搜索提示词..." />
+      </div>
+      <div class="gallery-sort-wrap">
+        <span style="font-size:11px;color:#888">排序</span>
+        <select id="gallerySort" style="font-size:11px;padding:4px 8px;border:0.5px solid var(--apple-border-soft);border-radius:5px;background:var(--apple-bg);color:var(--apple-text);outline:none;font-family:inherit">
+          <option>最新优先</option>
+          <option>最早优先</option>
+          <option>按风格</option>
+        </select>
+      </div>
+      <div class="view-btns">
+        <div class="vb active" id="viewGridBtn"><svg viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="4.5" height="4.5" rx=".8" stroke="currentColor" stroke-width="1.1"/><rect x="7.5" y="1" width="4.5" height="4.5" rx=".8" stroke="currentColor" stroke-width="1.1"/><rect x="1" y="7.5" width="4.5" height="4.5" rx=".8" stroke="currentColor" stroke-width="1.1"/><rect x="7.5" y="7.5" width="4.5" height="4.5" rx=".8" stroke="currentColor" stroke-width="1.1"/></svg></div>
+        <div class="vb" id="viewListBtn"><svg viewBox="0 0 13 13" fill="none"><path d="M1 3h11M1 6.5h11M1 10h11" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+      </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="gallery-stats-bar apple-mb-4">
+      <div class="stat-item"><span class="stat-num">128</span><span class="stat-label">张图片</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><span class="stat-num">24</span><span class="stat-label">条语音</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><span class="stat-num">16</span><span class="stat-label">已收藏</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><span class="stat-num">本月 6,800 次</span><span class="stat-label">调用</span></div>
     </div>
 
     <!-- Category Filters -->
@@ -287,7 +430,7 @@
     <div class="apple-gallery-count apple-mb-4" id="galleryCount">加载中...</div>
 
     <!-- Grid -->
-    <div class="apple-gallery-grid" id="galleryGrid">
+    <div class="gallery-grid gallery-grid-4col" id="galleryGrid">
       <div class="apple-loading">
         <div class="apple-spinner apple-spinner-dark"></div>
         <div>提示词加载中...</div>
@@ -296,8 +439,10 @@
 
   </section>
 
-</div><!-- /.apple-content -->
-</div><!-- /.apple-layout -->
+</div><!-- content-body -->
+  </main>
+  </div><!-- main-content -->
+</div><!-- app -->
 
 <!-- ══ Gallery Modal ══ -->
 <div class="apple-modal-backdrop" id="galleryModal" role="dialog" aria-modal="true">
@@ -403,18 +548,31 @@ function dismissToast(toast) {
 }
 
 // ============================================================
-// Navigation (Apple Top Nav)
+// Navigation (Sidebar + Top Nav)
 // ============================================================
+function switchSection(tabName) {
+  switchTab(tabName);
+}
+
+function switchTab(tabName) {
+  activateTab(tabName);
+}
+
 function activateTab(tabName) {
+  // Sync legacy top nav tabs (kept for JS compatibility)
   document.querySelectorAll('.apple-nav-tab').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === tabName);
     b.setAttribute('aria-selected', b.dataset.tab === tabName ? 'true' : 'false');
   });
+  // Toggle panels
   document.querySelectorAll('.apple-panel').forEach(p =>
     p.classList.toggle('active', p.id === 'tab-' + tabName)
   );
+  // Lazy-load gallery when switching to gallery tab
+  if (tabName === 'gallery') ensureGalleryLoaded();
 }
 
+// Legacy top nav click handlers (sidebar nav is handled via onclick)
 document.querySelectorAll('.apple-nav-tab').forEach(btn => {
   btn.addEventListener('click', () => activateTab(btn.dataset.tab));
 });
@@ -731,12 +889,15 @@ imgPrompt.addEventListener('input', () => {
   }
 });
 
-// Style carousel → fill prompt
+// Style grid → fill prompt
+function selectStyle(el) {
+  document.querySelectorAll('.style-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
 presetTags.addEventListener('click', e => {
-  const card = e.target.closest('.apple-carousel-card');
+  const card = e.target.closest('.style-card');
   if (!card) return;
-  document.querySelectorAll('.apple-carousel-card').forEach(c => c.classList.remove('active'));
-  card.classList.add('active');
+  selectStyle(card);
   imgPrompt.value = card.dataset.prompt;
   imgPrompt.focus();
   imgPrompt.dispatchEvent(new Event('input'));
@@ -797,10 +958,10 @@ const ttsCharCount      = document.getElementById('ttsCharCount');
 const voiceGrid         = document.getElementById('voiceGrid');
 const ttsSpeed          = document.getElementById('ttsSpeed');
 const ttsSpeedVal       = document.getElementById('ttsSpeedVal');
-const btnSynthesize      = document.getElementById('btnSynthesize');
+const btnSynthesize     = document.getElementById('btnSynthesize');
 const ttsPlayer         = document.getElementById('ttsPlayer');
 const ttsPlaceholder    = document.getElementById('ttsPlaceholder');
-const ttsAudio          = document.getElementById('ttsAudio');
+const ttsAudio          = document.getElementById('ttsAudio') || new Audio();
 const ttsTextPreview    = document.getElementById('ttsTextPreview');
 const btnDownloadAudio  = document.getElementById('btnDownloadAudio');
 const btnCopyAudioUrl   = document.getElementById('btnCopyAudioUrl');
@@ -810,17 +971,73 @@ let currentAudioUrl = null;
 let selectedVoice  = 'male-qn-qingse';
 let isSynthesizing = false;
 
-// Waveform bars
+function formatTime(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function selVoice(el) {
+  document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  selectedVoice = el.dataset.voice;
+}
+
+// TTS player controls
+document.getElementById('ttsBtnPlay') && document.getElementById('ttsBtnPlay').addEventListener('click', () => {
+  if (ttsAudio.paused) { ttsAudio.play(); } else { ttsAudio.pause(); }
+});
+ttsAudio.addEventListener('play', () => {
+  const btn = document.getElementById('ttsBtnPlay');
+  if (btn) btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" width="14" height="14"><rect x="4" y="3" width="3" height="10" fill="currentColor"/><rect x="9" y="3" width="3" height="10" fill="currentColor"/></svg>';
+});
+ttsAudio.addEventListener('pause', () => {
+  const btn = document.getElementById('ttsBtnPlay');
+  if (btn) btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M5 3l8 5-8 5V3z" fill="currentColor"/></svg>';
+});
+ttsAudio.addEventListener('timeupdate', () => {
+  const pct = ttsAudio.duration ? ttsAudio.currentTime / ttsAudio.duration : 0;
+  const fill = document.getElementById('ttsProgressFill');
+  if (fill) fill.style.width = (pct * 100) + '%';
+  setWaveformPlayed(pct);
+  const cur = document.getElementById('ttsTimeCurrent');
+  if (cur) cur.textContent = formatTime(ttsAudio.currentTime);
+});
+ttsAudio.addEventListener('ended', () => {
+  setWaveformPlayed(1);
+  const btn = document.getElementById('ttsBtnPlay');
+  if (btn) btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M5 3l8 5-8 5V3z" fill="currentColor"/></svg>';
+});
+document.getElementById('ttsBtnDown') && document.getElementById('ttsBtnDown').addEventListener('click', btnDownloadAudio && btnDownloadAudio.click);
+document.getElementById('ttsBtnResynth') && document.getElementById('ttsBtnResynth').addEventListener('click', () => {
+  if (ttsText.value.trim()) debouncedSynthesize();
+});
+
+// Waveform bars — 80 bars for the player
 (function buildWaveform() {
   const waveform = document.getElementById('ttsWaveform');
   if (!waveform) return;
-  for (let i = 0; i < 48; i++) {
-    const bar = document.createElement('div');
-    bar.style.cssText = 'flex:1;background:var(--apple-blue);border-radius:2px;height:' + (Math.random() * 16 + 4) + 'px;transition:height 0.3s;';
-    bar.className = 'wave-bar';
+  for (let i = 0; i < 80; i++) {
+    const bar = document.createElement('span');
+    const h = Math.floor(8 + Math.random() * 32);
+    bar.style.cssText = 'flex-shrink:0;width:3px;border-radius:2px;background:var(--apple-border-soft);height:' + h + 'px;transition:background 0.2s,height 0.2s;';
+    bar.className = 'wf-bar';
     waveform.appendChild(bar);
   }
 })();
+
+function setWaveformPlayed(pct) {
+  const waveform = document.getElementById('ttsWaveform');
+  if (!waveform) return;
+  const bars = waveform.querySelectorAll('.wf-bar');
+  const played = Math.floor(pct * bars.length);
+  bars.forEach((b, i) => {
+    b.classList.remove('played', 'active-bar');
+    if (i < played) b.classList.add('played');
+    if (i === played) b.classList.add('active-bar');
+  });
+}
 
 ttsText.addEventListener('input', () => {
   const len = ttsText.value.length;
@@ -832,12 +1049,15 @@ ttsSpeed.addEventListener('input', () => {
 });
 
 voiceGrid.addEventListener('click', e => {
-  const card = e.target.closest('.apple-voice-card');
+  const card = e.target.closest('.voice-card');
   if (!card) return;
-  document.querySelectorAll('.apple-voice-card').forEach(x => x.classList.remove('active'));
-  card.classList.add('active');
-  selectedVoice = card.dataset.voice;
+  selVoice(card);
 });
+
+function filterTab(el) {
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
 
 const debouncedSynthesize = debounce(function() {
   if (isSynthesizing) return;
@@ -865,12 +1085,18 @@ const debouncedSynthesize = debounce(function() {
     const url = data.audio_url;
     if (!url) throw new Error('未返回音频地址');
     currentAudioUrl = url;
-    ttsTextPreview.textContent = text;
-    ttsTextPreview.style.display = '';
     ttsAudio.src = url;
+    ttsTextPreview.textContent = text.substring(0, 60) + (text.length > 60 ? '...' : '');
+    document.getElementById('ttsMeta').textContent = selectedVoice + ' · MP3 · 24000Hz';
     ttsPlaceholder.style.display = 'none';
-    ttsPlayer.style.display = 'flex';
+    ttsPlayer.style.display = 'block';
     ttsAudioActions.style.display = 'flex';
+    setWaveformPlayed(0);
+    document.getElementById('ttsProgressFill').style.width = '0%';
+    document.getElementById('ttsTimeCurrent').textContent = '0:00';
+    ttsAudio.addEventListener('loadedmetadata', () => {
+      document.getElementById('ttsTimeTotal').textContent = formatTime(ttsAudio.duration);
+    });
     showToast('语音合成成功', 'success');
   }).catch(err => {
     showToast(err.message || '合成失败');
@@ -1001,13 +1227,18 @@ function renderGallery() {
     const hasCn = p.promptCn && p.promptCn.length > 20;
     const hasEn = p.promptEn && p.promptEn.length > 20;
     return '<div class="apple-gallery-card" data-id="' + p.id + '">' +
-      '<div class="apple-gallery-card-img-wrap">' +
-      '<div style="aspect-ratio:3/2;display:flex;align-items:center;justify-content:center;background:var(--apple-bg-elevated);font-size:32px;">🖼</div>' +
+      '<div class="apple-gallery-card-img-wrap img-thumb">' +
+      '<div class="img-placeholder" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:11px;color:#bbb;">' +
+      '<svg viewBox="0 0 32 32" fill="none" width="24" height="24" style="opacity:.3"><rect x="3" y="5" width="26" height="20" rx="2" stroke="#555" stroke-width="2"/><path d="M3 18l7-6 5 4 5-6 9 8" stroke="#555" stroke-width="2" stroke-linejoin="round"/><circle cx="11" cy="12" r="2.5" stroke="#555" stroke-width="1.5"/></svg></div>' +
+      '<div class="img-overlay">' +
+      '<div class="ov-btn" title="收藏"><svg viewBox="0 0 12 12" fill="none" width="12" height="12"><path d="M6 1.5l1.2 3.5H11L8.2 7.1l1.2 3.4L6 8.5l-3.4 2L3.8 7 1 5h3.8L6 1.5z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg></div>' +
+      '<div class="ov-btn" title="下载"><svg viewBox="0 0 12 12" fill="none" width="12" height="12"><path d="M6 1v7M3.5 5.5L6 8l2.5-2.5M1 10h10" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+      '<div class="ov-btn" title="再次生成"><svg viewBox="0 0 12 12" fill="none" width="12" height="12"><path d="M2 6a4 4 0 107 2.8M2 6V3M2 6H5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
       '</div>' +
-      '<div class="apple-gallery-card-body">' +
-      '<div class="apple-gallery-card-title">' + escapeHtml(p.title) + '</div>' +
-      '<div class="apple-gallery-card-tags">' + cats + '</div>' +
-      '<div style="font-size:12px;color:var(--apple-text-secondary);margin-top:4px;line-height:1.4;">' + preview + '</div>' +
+      '</div>' +
+      '<div class="apple-gallery-card-body img-info">' +
+      '<div class="img-prompt">' + preview + '</div>' +
+      '<div class="img-meta">' + cats + '<span class="img-time">' + escapeHtml(p.title) + '</span></div>' +
       '</div></div>';
   }).join('');
 }
@@ -1066,11 +1297,13 @@ modalUseEn.addEventListener('click', () => {
 });
 
 // Lazy-load gallery only when tab first opens
-const galleryNavBtn = document.querySelector('.apple-nav-tab[data-tab="gallery"]');
 let galleryLoaded = false;
-galleryNavBtn && galleryNavBtn.addEventListener('click', () => {
+function ensureGalleryLoaded() {
   if (!galleryLoaded) { galleryLoaded = true; loadPrompts(); }
-});
+}
+// Trigger via sidebar nav click
+const galleryNavBtn = document.getElementById('navGallery');
+galleryNavBtn && galleryNavBtn.addEventListener('click', ensureGalleryLoaded);
 
 // Lightbox for gallery modal images
 const lightbox      = document.getElementById('lightbox');
@@ -1098,6 +1331,7 @@ lightboxDownload && lightboxDownload.addEventListener('click', () => {
 lightboxCopy && lightboxCopy.addEventListener('click', () => {
   navigator.clipboard.writeText(lightboxImg.src).then(() => showToast('链接已复制', 'success')).catch(() => showToast('复制失败'));
 });
+
 </script>
 </body>
 </html>

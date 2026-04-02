@@ -4,20 +4,46 @@
  */
 
 :root {
-  /* ── Colors ── */
-  --apple-bg:          #FFFFFF;
-  --apple-bg-elevated: #F5F5F7;
+  /* ── Colors — Warm Orange Design System ── */
+  --brand:           #E5450A;
+  --brand-light:     #FDF0EB;
+  --brand-mid:       #F47A4A;
+  --brand-dark:      #B33508;
+
+  --bg-page:         #F7F2EE;
+  --bg-input:        #FFFAF8;
+  --bg-hover:        #FDF6F3;
+
+  --border:          #EDDEDB;
+  --border-mid:      #F5C4B3;
+
+  --text-primary:    #1a1a1a;
+  --text-secondary:  #666;
+  --text-muted:       #999;
+  --text-hint:        #bbb;
+
+  /* ── Semantic Apple aliases (for backward compat in components) ── */
+  --apple-bg:          #F7F2EE;
+  --apple-bg-page:     #F7F2EE;
+  --apple-bg-input:    #FFFAF8;
+  --apple-bg-hover:    #FDF6F3;
+  --apple-bg-elevated: #FFFFFF;
   --apple-bg-card:     #FFFFFF;
-  --apple-border:      rgba(0, 0, 0, 0.06);
-  --apple-border-soft:#E5E5EA;
+  --apple-border:      #EDDEDB;
+  --apple-border-soft: #EDDEDB;
 
-  --apple-text:        #1D1D1F;
-  --apple-text-secondary: #86868B;
-  --apple-text-placeholder: #C7C7CC;
+  --apple-text:        #1a1a1a;
+  --apple-text-secondary: #666;
+  --apple-text-placeholder: #bbb;
 
-  --apple-blue:        #0071E3;
-  --apple-blue-hover:  #0077ED;
-  --apple-blue-light:   rgba(0, 113, 227, 0.1);
+  --apple-brand:        #E5450A;
+  --apple-brand-light:  #FDF0EB;
+  --apple-brand-mid:    #F47A4A;
+  --apple-brand-dark:   #B33508;
+
+  --apple-blue:        #E5450A;
+  --apple-blue-hover:  #B33508;
+  --apple-blue-light:   #FDF0EB;
   --apple-green:       #34C759;
   --apple-red:         #FF3B30;
   --apple-orange:      #FF9500;
@@ -70,7 +96,7 @@
   --apple-shadow-sm:  0 1px 3px rgba(0, 0, 0, 0.06);
   --apple-shadow-md:  0 2px 12px rgba(0, 0, 0, 0.08);
   --apple-shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.12);
-  --apple-shadow-focus: 0 0 0 4px rgba(0, 113, 227, 0.15);
+  --apple-shadow-focus: 0 0 0 4px rgba(229, 69, 10, 0.15);
 
   /* ── Transitions ── */
   --apple-ease:      cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -80,7 +106,7 @@
   --apple-duration-slow: 0.35s;
 
   /* ── Layout ── */
-  --apple-nav-height: 56px;
+  --apple-nav-height: 0px; /* removed — replaced by sidebar */
   --apple-content-max: 680px;
-  --apple-sidebar-width: 0px; /* removed */
+  --apple-sidebar-width: 220px;
 }
