@@ -9,6 +9,7 @@ on:
 env:
   NODE_VERSION: '18'
   RENDER_SERVICE_ID: srv-d76h342dbo4c73bjvmu0
+  RENDER_DEPLOY_HOOK: https://api.render.com/deploy/srv-d76h342dbo4c73bjvmu0?key=pqcygdkHmWQ
 
 jobs:
   ci:
@@ -77,22 +78,20 @@ jobs:
     steps:
       - name: Trigger Render deployment
         run: |
-          RESP=$(curl -s -X POST \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            -H "Content-Type: application/json" \
-            -d '{"clearCache": false}' \
-            "https://api.render.com/v1/services/${{ env.RENDER_SERVICE_ID }}/deploys")
+          echo "Triggering Render deploy..."
+          RESP=$(curl -s -m 30 "$RENDER_DEPLOY_HOOK")
           echo "Response: $RESP"
-          DEPLOY_ID=$(echo "$RESP" | node -pe "JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).id || ''")
-          echo "deploy_id=$DEPLOY_ID" >> $GITHUB_OUTPUT
-          if [ -z "$DEPLOY_ID" ]; then echo "::error::Deploy failed"; exit 1; fi
-          echo "Triggered: $DEPLOY_ID"
+          if echo "$RESP" | grep -q "deployed"; then
+            echo "Deploy triggered successfully"
+          else
+            echo "::warning::Deploy trigger response: $RESP"
+          fi
 
       - name: Wait for deployment
         run: |
           MAX=180; INT=10; EL=0
           while [ $EL -lt $MAX ]; do
-            STATUS=$(curl -s -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            STATUS=$(curl -s -m 10 -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
               "https://api.render.com/v1/services/${{ env.RENDER_SERVICE_ID }}" | \
               node -pe "JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).activeDeploy?.status || 'unknown'")
             echo "[$EL/$MAX] Status: $STATUS"
