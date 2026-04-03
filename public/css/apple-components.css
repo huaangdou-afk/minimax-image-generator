@@ -1270,9 +1270,10 @@ body {
 }
 
 .logo-text {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .logo-badge {
@@ -1411,7 +1412,7 @@ main.main {
   gap: var(--apple-space-3);
   flex-shrink: 0;
 }
-.topbar-title { font-size: 13px; font-weight: 600; color: var(--apple-text); }
+.topbar-title { font-size: 15px; font-weight: 600; color: var(--apple-text); letter-spacing: -0.01em; }
 .topbar-sep { width: 1px; height: 14px; background: var(--border); }
 .topbar-sub { font-size: 11px; color: var(--apple-text-secondary); }
 .topbar-quota {
