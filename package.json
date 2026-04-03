@@ -39,8 +39,9 @@
     ],
     "verbose": true,
     "forceExit": true,
-    "detectOpenHandles": true,
-    "testTimeout": 120000
+    "detectOpenHandles": false,
+    "testTimeout": 30000,
+    "maxWorkers": 2
   },
   "engines": {
     "node": ">=18.0.0"

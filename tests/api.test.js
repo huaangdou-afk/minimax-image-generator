@@ -21,11 +21,15 @@ const client = axios.create({
 });
 
 // ============================================
-// Helper: Skip if no API key
+// Helper: Skip live API tests (image gen + TTS)
 // ============================================
 const skipIfNoApiKey = () => {
   if (!API_KEY) {
-    console.warn('SKIP: MINIMAX_API_KEY not set, skipping live API test');
+    console.warn('SKIP: MINIMAX_API_KEY not set');
+    return true;
+  }
+  if (process.env.SKIP_LIVE_API === '1') {
+    console.warn('SKIP: SKIP_LIVE_API=1, skipping live API test');
     return true;
   }
   return false;
