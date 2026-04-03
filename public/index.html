@@ -34,15 +34,15 @@
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section-label">创作工具</div>
-      <div class="nav-item active" id="navImage" onclick="switchSection('image')">
+      <div class="nav-item active" id="navImage" onclick="activateTab('image')">
         <svg viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 8l3.5-3 3 2.5 2.5-3 4 4" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
         图片生成
       </div>
-      <div class="nav-item" id="navTts" onclick="switchSection('tts')">
+      <div class="nav-item" id="navTts" onclick="activateTab('tts')">
         <svg viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 5.5c0-1.1.9-2 2-2s2 .9 2 2v3a2 2 0 01-4 0V5.5z" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 8.5a4 4 0 008 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         语音合成
       </div>
-      <div class="nav-item" id="navGallery" onclick="switchSection('gallery')">
+      <div class="nav-item" id="navGallery" onclick="activateTab('gallery')">
         <svg viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="8" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="8" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
         画廊
       </div>
@@ -562,6 +562,13 @@ function switchTab(tabName) {
 }
 
 function activateTab(tabName) {
+  // Sync sidebar nav items
+  document.querySelectorAll('.nav-item').forEach(n => {
+    const match = n.id === 'navImage' && tabName === 'image'
+      || n.id === 'navTts' && tabName === 'tts'
+      || n.id === 'navGallery' && tabName === 'gallery';
+    n.classList.toggle('active', !!match);
+  });
   // Sync legacy top nav tabs (kept for JS compatibility)
   document.querySelectorAll('.apple-nav-tab').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === tabName);

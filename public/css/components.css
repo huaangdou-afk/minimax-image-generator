@@ -132,10 +132,7 @@ html { scroll-behavior: smooth; }
   display: flex;
   flex-direction: column;
   gap: 2px;
-  position: sticky;
-  top: var(--header-h);
-  height: calc(100vh - var(--header-h));
-  overflow-y: auto;
+  /* position: sticky and height removed — handled by apple-components.css */
 }
 
 .sidebar-section { margin-bottom: 8px; }

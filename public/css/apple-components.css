@@ -17,13 +17,14 @@ html {
 }
 
 body {
-  font-family: var(--apple-font), var(--apple-font-zh), var(--apple-font);
+  font-family: var(--apple-font-zh), var(--apple-font-en), system-ui, -apple-system, sans-serif;
   font-size: var(--apple-text-base);
   line-height: var(--apple-leading-normal);
   color: var(--apple-text);
   background: var(--apple-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* ── Scrollbar ── */
@@ -1247,6 +1248,7 @@ body {
   border-right: 0.5px solid var(--border);
   display: flex;
   flex-direction: column;
+  position: relative; /* Override legacy sticky positioning */
 }
 
 .sidebar-logo {
@@ -1308,6 +1310,7 @@ body {
   color: var(--text-secondary);
   transition: all 0.15s;
   margin-bottom: 2px;
+  position: relative;
 }
 
 .nav-item:hover {
@@ -1319,6 +1322,10 @@ body {
   background: var(--brand-light);
   color: var(--brand-dark);
   font-weight: 500;
+}
+.nav-item.active::before {
+  background: var(--brand);
+  box-shadow: 0 0 6px var(--brand);
 }
 
 .nav-item svg {

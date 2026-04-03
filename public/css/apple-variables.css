@@ -52,8 +52,9 @@
   --apple-gray-medium: #E5E5EA;
 
   /* ── Typography ── */
-  --apple-font:        -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
-  --apple-font-zh:     "PingFang SC", "Noto Sans SC", sans-serif;
+  --apple-font:        system-ui, -apple-system, "Helvetica Neue", "Noto Sans SC", sans-serif;
+  --apple-font-en:     system-ui, -apple-system, "Space Grotesk", sans-serif;
+  --apple-font-zh:     "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
   --apple-font-mono:    "SF Mono", "Menlo", "Monaco", monospace;
 
   --apple-text-xs:   11px;
