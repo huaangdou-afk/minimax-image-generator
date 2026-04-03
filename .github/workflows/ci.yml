@@ -84,15 +84,17 @@ jobs:
     steps:
       # Pre-warm current instance so Render can serve traffic during build transition
       - name: Pre-warm current instance
+        continue-on-error: true
         run: |
           echo "Pre-warming current instance..."
           for i in 1 2 3; do
             RESP=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 \
               https://minimax-image-generator.onrender.com/api/key-status)
             echo "Warm ping $i: $RESP"
-            [ "$RESP" = "200" ] && echo "Instance is warm ✓" && break
+            [ "$RESP" = "200" ] && echo "Instance is warm ✓" && exit 0
             sleep 3
           done
+          echo "Instance may be cold, proceeding with deploy anyway"
 
       - name: Trigger Render deployment
         run: |
