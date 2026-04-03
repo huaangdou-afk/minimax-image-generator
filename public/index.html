@@ -554,7 +554,7 @@ function dismissToast(toast) {
 // Navigation (Sidebar + Top Nav)
 // ============================================================
 function switchSection(tabName) {
-  switchTab(tabName);
+  activateTab(tabName);
 }
 
 function switchTab(tabName) {
@@ -569,6 +569,13 @@ function activateTab(tabName) {
       || n.id === 'navGallery' && tabName === 'gallery';
     n.classList.toggle('active', !!match);
   });
+  // Update topbar title
+  const titles = { image: '图片生成', tts: '语音合成', gallery: '画廊' };
+  const subs = { image: '基于 MiniMax Image 01 模型', tts: '基于speech-2.8-hd模型', gallery: '' };
+  const titleEl = document.getElementById('topbarTitle');
+  const subEl = document.getElementById('topbarSub');
+  if (titleEl) titleEl.textContent = titles[tabName] || '';
+  if (subEl) subEl.textContent = subs[tabName] || '';
   // Sync legacy top nav tabs (kept for JS compatibility)
   document.querySelectorAll('.apple-nav-tab').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === tabName);

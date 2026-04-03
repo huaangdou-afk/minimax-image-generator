@@ -8,7 +8,7 @@
 html, body {
   height: 100%;
   font-family: var(--font-sans);
-  background: var(--bg-base);
+  /* background handled by apple-components.css */
   color: var(--text-primary);
   font-size: 14px;
   line-height: 1.6;

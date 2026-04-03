@@ -1462,13 +1462,13 @@ main.main {
 .api-status { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--apple-text-secondary); }
 .dot-green { width: 5px; height: 5px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
 
-/* ── Content body — white bg, unified with sidebar ── */
-.content-body { flex: 1; display: flex; overflow: hidden; background: #fff; }
+/* ── Content body — warm cream bg, unified with sidebar ── */
+.content-body { flex: 1; display: flex; overflow: hidden; background: var(--apple-bg); }
 .content-body > .apple-panel {
   padding: var(--apple-space-4);
   overflow-y: auto;
   flex: 1;
-  background: #fff;
+  background: var(--apple-bg);
 }
 
 /* ── Image Generation — Unified Workspace Layout ── */
@@ -1492,7 +1492,7 @@ main.main {
 }
 
 .img-preview-card {
-  background: var(--apple-bg-elevated);
+  background: #fff;
   border-radius: var(--apple-radius-lg);
   position: relative;
   overflow: hidden;
@@ -1501,6 +1501,7 @@ main.main {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
 }
 .img-preview-card img {
   width: 100%;
@@ -1525,9 +1526,11 @@ main.main {
   justify-content: center;
   gap: 14px;
   padding: 20px 16px;
-  background: var(--apple-bg-elevated);
+  background: #fff;
   border-radius: var(--apple-radius-lg);
   min-height: 240px;
+  /* Soft shadow to lift card off cream background */
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
 }
 .img-empty-hint {
   font-size: 12px;
@@ -1666,13 +1669,12 @@ main.main {
   align-items: center;
   gap: var(--apple-space-3);
   padding: 10px var(--apple-space-4);
-  background: var(--apple-bg-elevated);
+  background: #fff;
   border-radius: var(--apple-radius-md);
   overflow-x: auto;
   flex-shrink: 0;
   scrollbar-width: none;
-  /* No border — use shadow for subtle depth instead */
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
 }
 .img-tools-row::-webkit-scrollbar { display: none; }
 
@@ -1783,6 +1785,11 @@ main.main {
   position: sticky;
   top: 0;
   align-self: start;
+  /* Subtle warm card background to differentiate right column */
+  background: #fff;
+  border-radius: var(--apple-radius-lg);
+  padding: var(--apple-space-4);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
 }
 
 @media (max-width: 900px) {
@@ -1819,7 +1826,7 @@ main.main {
 .vc-play-btn { margin-left: auto; color: #F47A4A; }
 
 /* ── TTS Player Card ── */
-.player-card { background: #fff; border: 0.5px solid #EDDEDB; border-radius: 12px; padding: 24px; width: 100%; max-width: 480px; }
+.player-card { background: #fff; border-radius: 12px; padding: 24px; width: 100%; max-width: 480px; box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04); }
 .pc-title { font-size: 13px; font-weight: 500; color: #333; margin-bottom: 4px; }
 .pc-meta { font-size: 11px; color: #999; margin-bottom: 20px; }
 .waveform { height: 48px; display: flex; align-items: center; gap: 1.5px; margin-bottom: 16px; overflow: hidden; }
