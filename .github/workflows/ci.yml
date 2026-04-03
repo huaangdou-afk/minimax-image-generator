@@ -35,7 +35,7 @@ jobs:
         run: |
           for i in 1 2 3; do
             echo "Install attempt $i..."
-            npm ci && echo "Install succeeded" && exit 0
+            npm ci --ignore-scripts && echo "Install succeeded" && exit 0
             echo "Install failed, retrying..."
             sleep 5
           done

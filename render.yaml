@@ -5,7 +5,7 @@ services:
     branch: master
     type: web
     runtime: node
-    buildCommand: npm ci
+    buildCommand: npm ci --ignore-scripts
     startCommand: node server.js
     healthCheckPath: /api/key-status
     autoDeploy: true
