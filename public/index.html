@@ -306,6 +306,13 @@
           <div class="apple-input-footer">
             <span id="ttsCharCount">0 / 3000</span>
           </div>
+          <div class="tts-tip-row">
+            <span class="tts-tip-label">试试：</span>
+            <button class="tts-tip-chip" data-text="欢迎使用 MiniMax 智能语音合成服务，本服务基于 speech-2.8-hd 模型，支持多种音色选择。">欢迎播报</button>
+            <button class="tts-tip-chip" data-text="从前有一只小狐狸，它住在森林的深处。每天清晨，它都会穿过露珠闪烁的草地，去寻找今天的冒险故事。">讲故事</button>
+            <button class="tts-tip-chip" data-text="今天天气晴朗，气温18到26摄氏度，适宜户外活动。建议市民朋友注意防晒，适当补充水分。">新闻播报</button>
+            <button class="tts-tip-chip" data-text="全新智能音箱，支持语音交互、在线音乐、智能家居控制，让生活更便捷。立即购买，享受限时优惠。">产品介绍</button>
+          </div>
         </div>
       </div><!-- /.tts-col-left -->
 
@@ -967,13 +974,22 @@ imgHistoryList.addEventListener('click', e => {
 
 // Tip chips in empty state → fill prompt
 document.addEventListener('click', e => {
-  const chip = e.target.closest('.img-tip-chip');
-  if (!chip) return;
-  imgPrompt.value = chip.dataset.text || '';
-  imgPrompt.focus();
-  imgPrompt.dispatchEvent(new Event('input'));
-  // Scroll textarea into comfortable view
-  imgPrompt.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const imgChip = e.target.closest('.img-tip-chip');
+  if (imgChip) {
+    imgPrompt.value = imgChip.dataset.text || '';
+    imgPrompt.focus();
+    imgPrompt.dispatchEvent(new Event('input'));
+    imgPrompt.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  const ttsChip = e.target.closest('.tts-tip-chip');
+  if (ttsChip) {
+    const ttsTextarea = document.getElementById('ttsText');
+    ttsTextarea.value = ttsChip.dataset.text || '';
+    ttsTextarea.focus();
+    ttsTextarea.dispatchEvent(new Event('input'));
+    ttsTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 });
 
 // Lightbox — open on main image click

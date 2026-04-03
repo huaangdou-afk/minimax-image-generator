@@ -1590,6 +1590,35 @@ main.main {
   background: var(--brand-light);
 }
 
+/* TTS sample chips */
+.tts-tip-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.tts-tip-label {
+  font-size: 11px;
+  color: var(--apple-text-secondary);
+}
+.tts-tip-chip {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 0.5px solid var(--apple-border);
+  background: transparent;
+  color: var(--apple-text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.12s;
+}
+.tts-tip-chip:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+  background: var(--brand-light);
+}
+
 .img-action-col {
   display: flex;
   flex-direction: column;
