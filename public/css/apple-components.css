@@ -673,7 +673,9 @@ body {
 
 .voice-card.active {
   border-color: var(--brand);
+  border-width: 1.5px;
   background: #FDF0EB;
+  box-shadow: 0 0 0 3px rgba(229,69,10,0.08);
 }
 
 .vc-top { display: flex; align-items: center; gap: 8px; }

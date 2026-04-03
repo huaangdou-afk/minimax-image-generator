@@ -1000,9 +1000,17 @@ function formatTime(s) {
 }
 
 function selVoice(el) {
-  document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.voice-card').forEach(c => {
+    c.classList.remove('active');
+    // Reset play icon
+    const btn = c.querySelector('.vc-play-btn');
+    if (btn) btn.innerHTML = '<svg viewBox="0 0 8 8" fill="none" width="8" height="8"><path d="M2 1.5l4 2.5-4 2.5V1.5z" fill="currentColor"/></svg>';
+  });
   el.classList.add('active');
   selectedVoice = el.dataset.voice;
+  // Show checkmark on selected card
+  const btn = el.querySelector('.vc-play-btn');
+  if (btn) btn.innerHTML = '<svg viewBox="0 0 8 8" fill="none" width="8" height="8"><path d="M1.5 4l2 2 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
 
 // TTS player controls
