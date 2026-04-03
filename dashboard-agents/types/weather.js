@@ -1,6 +1,6 @@
 /**
- * Weather Agent — 中国城市天气（和风天气 API）
- * 使用心知天气免费接口，无需 key
+ * Weather Agent — 中国城市天气
+ * 天气 API Key 配置在 WEATHER_API_KEY 环境变量
  */
 const axios = require('axios');
 const BaseAgent = require('../base');
@@ -11,17 +11,20 @@ class WeatherAgent extends BaseAgent {
       name: '上海天气',
       icon: '🌤️',
       category: 'weather',
-      interval: '*/5 * * * *', // every 5 min
+      interval: '*/5 * * * *',
     });
     this.city = '上海';
   }
 
   async fetch() {
+    const apiKey = process.env.WEATHER_API_KEY;
+    if (!apiKey) {
+      return { title: '上海天气', value: '26°C', sub: '晴  ·  未配置 API Key', detail: '请在环境变量中设置 WEATHER_API_KEY' };
+    }
     try {
-      // 心知天气免费接口（可换成和风天气 key）
       const resp = await axios.get('https://api.seniverse.com/v3/weather/now.json', {
         params: {
-          key: 'SENSERVER_KEY',
+          key: apiKey,
           location: this.city,
           language: 'zh-Hans',
           unit: 'c',

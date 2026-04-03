@@ -32,7 +32,15 @@ jobs:
 
       # Single install — all deps (dev + prod), no duplicates
       - name: Install dependencies
-        run: npm ci
+        run: |
+          for i in 1 2 3; do
+            echo "Install attempt $i..."
+            npm ci && echo "Install succeeded" && exit 0
+            echo "Install failed, retrying..."
+            sleep 5
+          done
+          echo "All install attempts failed"
+          exit 1
 
       - name: Check package.json completeness
         run: |
