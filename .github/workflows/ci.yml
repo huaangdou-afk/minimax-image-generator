@@ -96,15 +96,21 @@ jobs:
           done
           echo "Instance may be cold, proceeding with deploy anyway"
 
-      - name: Trigger Render deployment
+      - name: Trigger Render deployment (clear cache)
         run: |
-          echo "Triggering Render deploy..."
-          RESP=$(curl -s -m 30 "$RENDER_DEPLOY_HOOK")
+          echo "Triggering Render deploy with cache clear..."
+          RESP=$(curl -s -m 30 -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            "https://api.render.com/v1/services/${{ env.RENDER_SERVICE_ID }}/deploys" \
+            -d '{"clearCache":true,"branch":"master"}')
           echo "Response: $RESP"
-          if echo "$RESP" | grep -q "deployed"; then
-            echo "Deploy triggered successfully"
+          if echo "$RESP" | grep -q "id"; then
+            echo "Deploy triggered with cache clear ✓"
           else
             echo "::warning::Deploy trigger response: $RESP"
+            # Fallback to webhook
+            curl -s -m 30 "$RENDER_DEPLOY_HOOK"
           fi
 
       # Poll Render build status, then verify new instance is warm
