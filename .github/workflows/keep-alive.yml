@@ -1,0 +1,22 @@
+name: Keep Alive
+
+# Every 10 minutes — ping production so Render instance stays warm
+# (Free tier instances sleep after 15 min of inactivity)
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:  # manual trigger
+
+jobs:
+  ping:
+    name: Ping Production
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Ping health endpoint
+        run: |
+          RESP=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+            https://minimax-image-generator.onrender.com/api/key-status)
+          echo "Status: $RESP"
+          [ "$RESP" = "200" ] && echo "Instance is warm ✓" || echo "Instance may be cold"
