@@ -28,7 +28,6 @@ app.use(helmet({
       'img-src':        ["'self'", 'data:', 'https:', 'blob:'],
       'media-src':      ["'self'", 'https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com', 'https://hailuo-image-algeng-data.oss-cn-wulanchabu.aliyuncs.com'],
       'connect-src':    ["'self'"],
-      'frame-src':     ["'none'"],
     },
   },
 }));
@@ -439,9 +438,10 @@ app.post('/api/analyze-style', analyzeStyleLimiter, async (req, res) => {
 // =====================
 // Global Error Handler
 // =====================
-app.use((err, req, res) => {
+// eslint-disable-next-line no-unused-vars -- Express error handler requires 4 args, next is unused
+app.use((err, req, res, next) => {
   console.error('[%s] Unhandled error:', req.traceId || 'unknown', err.message);
-  if (!res.headersSent) {
+  if (!res.headersSent && typeof res.status === 'function') {
     res.status(500).json({ error: 'Internal server error', traceId: req.traceId });
   }
 });
