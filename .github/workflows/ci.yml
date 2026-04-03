@@ -74,6 +74,18 @@ jobs:
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
 
     steps:
+      # Pre-warm current instance so Render can serve traffic during build transition
+      - name: Pre-warm current instance
+        run: |
+          echo "Pre-warming current instance..."
+          for i in 1 2 3; do
+            RESP=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 \
+              https://minimax-image-generator.onrender.com/api/key-status)
+            echo "Warm ping $i: $RESP"
+            [ "$RESP" = "200" ] && echo "Instance is warm ✓" && break
+            sleep 3
+          done
+
       - name: Trigger Render deployment
         run: |
           echo "Triggering Render deploy..."
@@ -85,16 +97,31 @@ jobs:
             echo "::warning::Deploy trigger response: $RESP"
           fi
 
-      # Poll for Render deployment status (cold start typically ~3 min on free tier)
+      # Poll Render build status, then verify new instance is warm
       - name: Wait for deployment
         run: |
-          MAX=240; INT=15; EL=0
+          MAX=240; INT=15; EL=0; DEPLOY_DONE=""
           while [ $EL -lt $MAX ]; do
             STATUS=$(curl -s -m 10 -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
               "https://api.render.com/v1/services/${{ env.RENDER_SERVICE_ID }}" | \
               node -pe "JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')).activeDeploy?.status || 'unknown'")
-            echo "[$EL/$MAX] Status: $STATUS"
-            [ "$STATUS" = "succeeded" ] && exit 0
+            echo "[$EL/$MAX] Build: $STATUS"
+
+            # Build succeeded — now wait for new instance to be warm
+            if [ "$STATUS" = "succeeded" ] && [ -z "$DEPLOY_DONE" ]; then
+              DEPLOY_DONE=1
+              echo "Build complete, waiting for new instance to be warm..."
+              for j in 1 2 3 4 5 6; do
+                sleep 5
+                RESP=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 \
+                  https://minimax-image-generator.onrender.com/api/key-status)
+                echo "[post-deploy] warm check $j: $RESP"
+                [ "$RESP" = "200" ] && echo "New instance is warm ✓" && exit 0
+              done
+              echo "Instance may still be cold, but build succeeded"
+              exit 0
+            fi
+
             [ "$STATUS" = "failed" ] && exit 1
             sleep $INT; EL=$((EL+INT))
           done
