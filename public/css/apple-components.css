@@ -667,16 +667,16 @@ body {
   user-select: none;
 }
 
+.voice-card.active {
+  border-color: var(--brand);
+  border-width: 0.5px;
+  background: #FDF0EB;
+  box-shadow: 0 0 0 3px rgba(229,69,10,0.06);
+}
+
 .voice-card:hover {
   border-color: #F47A4A;
   background: #FDF0EB;
-}
-
-.voice-card.active {
-  border-color: var(--brand);
-  border-width: 1.5px;
-  background: #FDF0EB;
-  box-shadow: 0 0 0 3px rgba(229,69,10,0.08);
 }
 
 .vc-top { display: flex; align-items: center; gap: 8px; }
@@ -841,12 +841,12 @@ body {
 .filter-tabs { display: flex; gap: 4px; }
 .ftab {
   font-size: 12px; padding: 5px 12px; border-radius: 20px;
-  border: 0.5px solid var(--apple-border); background: transparent;
+  border: none; background: transparent;
   color: var(--apple-text-secondary); cursor: pointer; white-space: nowrap;
   font-family: inherit; transition: all 0.15s;
 }
-.ftab:hover { background: #FDF6F3; color: var(--apple-text); }
-.ftab.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+.ftab:hover { background: var(--apple-bg-hover); color: var(--apple-text); }
+.ftab.active { background: var(--brand); color: #fff; }
 .search-box {
   display: flex; align-items: center; gap: 6px;
   padding: 5px 10px; border: 0.5px solid var(--apple-border);
@@ -881,15 +881,14 @@ body {
 /* Gallery card */
 .apple-gallery-card {
   background: #fff;
-  border: 0.5px solid var(--apple-border);
   border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.15s, transform 0.15s;
+  transition: box-shadow 0.15s, transform 0.15s;
 }
 
 .apple-gallery-card:hover {
-  border-color: #F47A4A;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
 .apple-gallery-card-img-wrap {
@@ -1245,7 +1244,7 @@ body {
   width: var(--apple-sidebar-width);
   flex-shrink: 0;
   background: #fff;
-  border-right: 0.5px solid var(--border);
+  border-right: 0.5px solid rgba(237,222,219,0.5);
   display: flex;
   flex-direction: column;
   position: relative; /* Override legacy sticky positioning */
@@ -1404,7 +1403,7 @@ main.main {
 /* ── Topbar — unified with quota integrated ── */
 .topbar {
   background: #fff;
-  border-bottom: 0.5px solid var(--border);
+  border-bottom: 0.5px solid rgba(237,222,219,0.5);
   padding: 0 var(--apple-space-4);
   height: 44px;
   display: flex;
@@ -1494,7 +1493,6 @@ main.main {
 
 .img-preview-card {
   background: var(--apple-bg-elevated);
-  border: 0.5px solid var(--apple-border);
   border-radius: var(--apple-radius-lg);
   position: relative;
   overflow: hidden;
@@ -1528,7 +1526,6 @@ main.main {
   gap: 14px;
   padding: 20px 16px;
   background: var(--apple-bg-elevated);
-  border: 0.5px solid var(--apple-border);
   border-radius: var(--apple-radius-lg);
   min-height: 240px;
 }
@@ -1638,9 +1635,9 @@ main.main {
   align-items: center;
   justify-content: center;
   border-radius: var(--apple-radius-sm);
-  border: 0.5px solid var(--apple-border);
+  border: 0.5px solid rgba(237,222,219,0.6);
   background: transparent;
-  color: var(--apple-text);
+  color: var(--apple-text-secondary);
   cursor: pointer;
   font-family: inherit;
   font-size: 12px;
@@ -1648,7 +1645,7 @@ main.main {
   transition: all 0.15s;
   padding: 6px 10px;
 }
-.img-btn:hover { background: var(--apple-bg-hover); }
+.img-btn:hover { background: var(--apple-bg-hover); color: var(--apple-text); }
 .img-btn-icon { padding: 6px 8px; font-size: 13px; width: 32px; height: 32px; }
 .img-btn-primary {
   background: var(--brand);
@@ -1660,7 +1657,7 @@ main.main {
   font-size: 13px;
 }
 .img-btn-primary:hover { background: var(--brand-dark); border-color: var(--brand-dark); }
-.img-btn-ghost { border-color: transparent; }
+.img-btn-ghost { border-color: transparent; background: transparent; }
 .img-btn-ghost:hover { border-color: var(--apple-border); }
 
 /* Tools row — single horizontal toolbar */
@@ -1670,11 +1667,12 @@ main.main {
   gap: var(--apple-space-3);
   padding: 10px var(--apple-space-4);
   background: var(--apple-bg-elevated);
-  border: 0.5px solid var(--apple-border);
   border-radius: var(--apple-radius-md);
   overflow-x: auto;
   flex-shrink: 0;
   scrollbar-width: none;
+  /* No border — use shadow for subtle depth instead */
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 .img-tools-row::-webkit-scrollbar { display: none; }
 
@@ -1739,7 +1737,7 @@ main.main {
   transition: all 0.12s;
 }
 .style-chip:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
-.style-chip.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+.style-chip.active { background: var(--brand); color: #fff; border-color: var(--brand); font-weight: 500; }
 
 .img-tool-history { gap: 6px; }
 .img-history-scroll {
@@ -1811,7 +1809,7 @@ main.main {
   gap: 6px;
 }
 .voice-card:hover { border-color: #F47A4A; background: #FDF0EB; }
-.voice-card.active { border-color: #E5450A; background: #FDF0EB; }
+.voice-card.active { border-color: #E5450A; border-width: 0.5px; background: #FDF0EB; box-shadow: 0 0 0 3px rgba(229,69,10,0.06); }
 .vc-top { display: flex; align-items: center; gap: 8px; }
 .vc-av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
 .vc-name { font-size: 12px; font-weight: 500; color: #333; }
@@ -1868,7 +1866,7 @@ main.main {
 .slider-row input[type=range] { flex: 1; accent-color: #E5450A; }
 
 /* ── Gallery ── */
-.gallery-toolbar { background: #fff; border-bottom: 0.5px solid #EDDEDB; padding: 10px 24px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
+.gallery-toolbar { background: #fff; padding: 10px 24px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
 .filter-tabs { display: flex; gap: 4px; }
 .ftab { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 0.5px solid #EDDEDB; background: transparent; color: #666; cursor: pointer; white-space: nowrap; font-family: inherit; transition: all 0.15s; }
 .ftab:hover { background: #FDF6F3; color: #333; }
@@ -1877,7 +1875,7 @@ main.main {
 .search-box svg { width: 13px; height: 13px; color: #bbb; flex-shrink: 0; }
 .search-box input { border: none; background: transparent; font-size: 12px; color: #333; outline: none; width: 100%; font-family: inherit; }
 
-.gallery-stats { background: #FDF0EB; border-bottom: 0.5px solid #F5C4B3; padding: 8px 24px; display: flex; align-items: center; gap: 24px; flex-shrink: 0; }
+.gallery-stats { background: #FDF0EB; padding: 8px 24px; display: flex; align-items: center; gap: 24px; flex-shrink: 0; }
 .stat-item { display: flex; align-items: center; gap: 6px; }
 .stat-num { font-size: 13px; font-weight: 500; color: #B33508; }
 .stat-label { font-size: 11px; color: #F47A4A; }
