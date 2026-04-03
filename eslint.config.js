@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import globals from 'globals';
 
 export default [
   js.configs.recommended,
@@ -10,6 +11,7 @@ export default [
       'quick_test.js',
       'scenario_test.js',
       '.claude/**/*.js',
+      'multi-agent-dashboard/',
     ],
   },
   {
@@ -26,21 +28,19 @@ export default [
     rules: { 'no-undef': 'off', 'no-unused-vars': 'off' },
   },
   {
-    files: ['public/**/*.js'],
+    files: ['public/**/*.js', 'dashboard-public/**/*.js'],
     languageOptions: {
       sourceType: 'module',
       globals: {
-        document: 'readonly', fetch: 'readonly', URL: 'readonly',
-        navigator: 'readonly', localStorage: 'readonly', console: 'readonly',
-        setTimeout: 'readonly', clearTimeout: 'readonly',
-        requestAnimationFrame: 'readonly', alert: 'readonly',
-        open: 'readonly', location: 'readonly', Image: 'readonly',
+        ...globals.browser,
+        refreshAll: 'readonly', refreshCell: 'readonly',
+        closeModal: 'readonly', _modalCurrentId: 'readonly',
       },
     },
     rules: { 'no-undef': 'off' },
   },
   {
-    files: ['server.js', 'parse_prompts.js', 'playwright.config.js'],
+    files: ['server.js', 'parse_prompts.js', 'playwright.config.js', 'dashboard-agents/**/*.js'],
     languageOptions: {
       sourceType: 'commonjs',
       globals: {

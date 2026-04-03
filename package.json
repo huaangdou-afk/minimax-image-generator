@@ -15,10 +15,12 @@
   },
   "dependencies": {
     "axios": "^1.6.0",
+    "cheerio": "^1.0.0",
     "dotenv": "^16.4.5",
     "express": "^4.18.2",
     "express-rate-limit": "^7.5.0",
-    "helmet": "^8.0.0"
+    "helmet": "^8.0.0",
+    "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "@mcp-b/chrome-devtools-mcp": "^2.2.1",

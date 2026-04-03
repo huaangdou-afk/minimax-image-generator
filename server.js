@@ -436,6 +436,76 @@ app.post('/api/analyze-style', analyzeStyleLimiter, async (req, res) => {
 });
 
 // =====================
+// Dashboard: Multi-agent Dashboard
+// =====================
+const cron = require('node-cron');
+const dashboardRegistry = require('./dashboard-agents/registry');
+
+const dashSSEClients = new Set();
+
+function dashSSEBroadcast(event, data) {
+  const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+  for (const res of dashSSEClients) {
+    try { res.write(payload); } catch { dashSSEClients.delete(res); }
+  }
+}
+
+async function runDashAgent(agent) {
+  // eslint-disable-next-line no-unused-vars
+  const _result = await agent.run();
+  const state = agent.toJSON();
+  dashSSEBroadcast('cell-update', state);
+  return state;
+}
+
+async function runAllDashAgents() {
+  await Promise.allSettled(dashboardRegistry.map(a => runDashAgent(a)));
+}
+
+// Register cron jobs
+dashboardRegistry.forEach(agent => {
+  if (!cron.validate(agent.interval)) return;
+  cron.schedule(agent.interval, () => runDashAgent(agent), {
+    scheduled: true,
+    timezone: 'Asia/Shanghai',
+  });
+});
+
+// Bootstrap: run all once
+runAllDashAgents();
+
+// Dashboard static files
+app.use('/dashboard', express.static(path.join(__dirname, 'dashboard-public')));
+
+// Dashboard API
+app.get('/dashboard/api/cells', (_req, res) => {
+  res.json(dashboardRegistry.map(a => a.toJSON()));
+});
+
+app.get('/dashboard/api/events', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+  res.write(`event: init\ndata: ${JSON.stringify(dashboardRegistry.map(a => a.toJSON()))}\n\n`);
+  const heartbeat = setInterval(() => { res.write(': heartbeat\n\n'); }, 30000);
+  dashSSEClients.add(res);
+  req.on('close', () => { clearInterval(heartbeat); dashSSEClients.delete(res); });
+});
+
+app.post('/dashboard/api/admin/refresh/:id', async (req, res) => {
+  const agent = dashboardRegistry.find(a => a.id === req.params.id);
+  if (!agent) return res.status(404).json({ error: 'Agent not found' });
+  const state = await runDashAgent(agent);
+  res.json({ ok: true, agent: state });
+});
+
+app.post('/dashboard/api/admin/refresh-all', async (_req, res) => {
+  await runAllDashAgents();
+  res.json({ ok: true });
+});
+
+// =====================
 // Global Error Handler
 // =====================
 // eslint-disable-next-line no-unused-vars -- Express error handler requires 4 args, next is unused
