@@ -218,7 +218,9 @@
             <button class="img-btn img-btn-icon" id="styleRemoveBtn" title="移除" style="font-size:10px;width:20px;height:20px;">✕</button>
           </div>
           <div id="styleLoading" style="display:none;font-size:11px;color:var(--apple-text-secondary);">分析中...</div>
-          <div id="styleError" style="display:none;font-size:11px;color:var(--apple-red);">⚠ 分析失败</div>
+          <div id="styleError" style="display:none;font-size:11px;color:var(--apple-red);">
+            ⚠ <span id="styleErrorText">分析失败</span>
+          </div>
         </div>
 
         <!-- Style presets -->
@@ -581,19 +583,18 @@ document.querySelectorAll('.apple-nav-tab').forEach(btn => {
 // ============================================================
 // Style Reference Upload (Task 10)
 // ============================================================
-const styleFileInput   = document.getElementById('styleFileInput');
-const styleUploadZone  = document.getElementById('styleUploadZone');
-const styleUploadCard  = document.getElementById('styleUploadCard');
-const styleResult      = document.getElementById('styleResult');
-const styleLoading     = document.getElementById('styleLoading');
-const styleError       = document.getElementById('styleError');
-const stylePreviewImg  = document.getElementById('stylePreviewImg');
-const styleTags        = document.getElementById('styleTags');
-const styleAppendBtn   = document.getElementById('styleAppendBtn');
-const styleRemoveBtn   = document.getElementById('styleRemoveBtn');
+const styleFileInput    = document.getElementById('styleFileInput');
+const styleUploadZone   = document.getElementById('styleUploadZone');
+const styleResult       = document.getElementById('styleResult');
+const styleLoading      = document.getElementById('styleLoading');
+const styleError        = document.getElementById('styleError');
+const stylePreviewImg   = document.getElementById('stylePreviewImg');
+const styleTags         = document.getElementById('styleTags');
+const styleAppendBtn    = document.getElementById('styleAppendBtn');
+const styleRemoveBtn    = document.getElementById('styleRemoveBtn');
 const styleReanalyzeBtn = document.getElementById('styleReanalyzeBtn');
-const styleRetryBtn    = document.getElementById('styleRetryBtn');
-const styleErrorText   = document.getElementById('styleErrorText');
+const styleRetryBtn     = document.getElementById('styleRetryBtn');
+const styleErrorText    = document.getElementById('styleErrorText');
 
 let styleTagsList = [];
 let styleFile = null;
@@ -634,11 +635,11 @@ styleRemoveBtn.addEventListener('click', () => {
   styleFileInput.value = '';
 });
 
-styleReanalyzeBtn.addEventListener('click', () => {
+styleReanalyzeBtn?.addEventListener('click', () => {
   if (styleFile) analyzeStyleFile(styleFile);
 });
 
-styleRetryBtn.addEventListener('click', () => {
+styleRetryBtn?.addEventListener('click', () => {
   styleFileInput.click();
 });
 
