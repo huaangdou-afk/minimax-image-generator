@@ -512,15 +512,25 @@ function parseSize(r) {
   const [w,h] = r.split(':').map(Number);
   return { width: 1024, height: Math.round(1024 * h / w) };
 }
-async function apiCall(url, body) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || `请求失败 (${res.status})`);
-  return data;
+async function apiCall(url, body, timeout = 60000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `请求失败 (${res.status})`);
+    return data;
+  } catch (err) {
+    clearTimeout(timer);
+    if (err.name === 'AbortError') throw new Error('请求超时，MiniMax API 响应太慢，请稍后重试');
+    throw err;
+  }
 }
 
 function debounce(fn, delay) {
@@ -894,10 +904,13 @@ async function generateImage() {
     renderImage(url);
     showToast('图片生成成功！', 'success');
   } catch(err) {
+    const friendly = err.message === 'Failed to fetch'
+      ? '网络连接失败，请检查网络后重试'
+      : err.message;
     imageDisplay.innerHTML =
       '<div style="text-align:center;padding:40px;color:var(--apple-red);">' +
       '<div style="font-size:32px;margin-bottom:8px;">⚠</div>' +
-      '<div style="font-size:13px;">' + escapeHtml(err.message) + '</div>' +
+      '<div style="font-size:13px;">' + escapeHtml(friendly) + '</div>' +
       '<button class="apple-btn apple-btn-secondary" style="margin-top:12px;height:36px;font-size:13px;" id="btnRetry">🔄 重试</button></div>';
     document.getElementById('btnRetry') && document.getElementById('btnRetry').addEventListener('click', generateImage);
   } finally {
